@@ -1,18 +1,17 @@
 /**
  * @module Core
  */
-
-import {
-  generateProgressDetails,
-  generateProgressSummary,
-} from "../utils";
-import * as core from '@actions/core'
-import type { CheckGroupConfig } from "../types";
-import type { Context } from "probot";
+ import * as core from '@actions/core'
+ import {
+  generateProgressDetailsCLI,
+  commentOnPr,
+} from "./generate_progress";
+import { CheckRunData } from '../types';
+import { matchFilenamesToSubprojects } from "./subproj_matching";
+import { satisfyExpectedChecks } from "./satisfy_expected_checks";
 import { fetchConfig } from "./config_getter";
-import { matchFilenamesToSubprojects } from "../utils";
-import { satisfyExpectedChecks } from "../utils";
-import { SubProjConfig } from "../types";
+import type { CheckGroupConfig, CheckResult, SubProjConfig } from "../types";
+import type { Context } from "probot";
 
 /**
  * The orchestration class.
@@ -25,6 +24,7 @@ export class CheckGroup {
 
   intervalTimer: ReturnType<typeof setTimeout> = setTimeout(() => '', 0);
   timeoutTimer: ReturnType<typeof setTimeout> = setTimeout(() => '', 0);
+  inputs: Record<string, any> = {};
 
   constructor(
     pullRequestNumber: number,
@@ -50,11 +50,19 @@ export class CheckGroup {
       core.debug(`Expected checks are: ${JSON.stringify(expectedChecks)}`);
     }
 
+    const maintainers = core.getInput('maintainers')
+    this.inputs.maintainers = maintainers
+
+    const owner = core.getInput('owner')
+    this.inputs.owner = owner
+
     const interval = parseInt(core.getInput('interval'))
+    this.inputs.interval = interval
     core.info(`Check interval: ${interval}`);
     this.runCheck(subprojs, 1, interval * 1000)
 
     const timeout = parseInt(core.getInput('timeout'))
+    this.inputs.timeout = timeout
     core.info(`Timeout: ${timeout}`);
     // set a timeout that will stop the job to avoid polling the GitHub API infinitely
     this.timeoutTimer = setTimeout(
@@ -63,29 +71,24 @@ export class CheckGroup {
         core.setFailed(
           `The timeout of ${timeout} minutes has triggered but not all required jobs were passing.`
           + ` This job will need to be re-run to merge your PR.`
-          + ` If you do not have write access to the repository you can ask ${core.getInput('maintainers')} to re-run it for you.`
-          + ` If you have any other questions, you can reach out to ${core.getInput('owner')} for help.`
+          + ` If you do not have write access to the repository you can ask ${maintainers} to re-run it for you.`
+          + ` If you have any other questions, you can reach out to ${owner} for help.`
         )
       }, timeout * 60 * 1000 
     )
   }
 
-  async runCheck(subprojs, tries: number, interval: number) {
+  async runCheck(subprojs: SubProjConfig[], tries: number, interval: number): Promise<void> {
     try {
       // print in a group to reduce verbosity
       core.startGroup(`Check ${tries}`);
       const postedChecks = await getPostedChecks(this.context, this.sha);
       core.debug(`postedChecks: ${JSON.stringify(postedChecks)}`);
-      
-      const conclusion = satisfyExpectedChecks(subprojs, postedChecks);
-      const summary = generateProgressSummary(subprojs, postedChecks)
-      const details = generateProgressDetails(subprojs, postedChecks)
-      core.info(
-        `${this.config.customServiceName} conclusion: '${conclusion}':\n${summary}\n${details}`
-      )
+      const result = satisfyExpectedChecks(subprojs, postedChecks);
+      this.notifyProgress(subprojs, postedChecks, result)
       core.endGroup();
     
-      if (conclusion === "all_passing") {
+      if (result === "all_passing") {
         core.info("All required checks were successful!")
         clearTimeout(this.intervalTimer)
         clearTimeout(this.timeoutTimer)
@@ -99,6 +102,18 @@ export class CheckGroup {
       clearTimeout(this.intervalTimer)
       clearTimeout(this.timeoutTimer)
     }
+  }
+
+  async notifyProgress(
+    subprojs: SubProjConfig[],
+    postedChecks: Record<string, CheckRunData>,
+    result: CheckResult
+  ): Promise<void> {
+    const details = generateProgressDetailsCLI(subprojs, postedChecks)
+    core.info(
+      `${this.config.customServiceName} result: '${result}':\n${details}`
+    )
+    commentOnPr(this.context, result, this.inputs, subprojs, postedChecks)
   } 
 
   /**
@@ -126,18 +141,23 @@ export {fetchConfig};
  * Fetches a list of already finished
  * checks.
  */
-const getPostedChecks = async (context: Context, sha: string): Promise<Record<string, string>> => {
+const getPostedChecks = async (context: Context, sha: string): Promise<Record<string, CheckRunData>> => {
   const checkRuns = await context.octokit.paginate(
     context.octokit.checks.listForRef,
     context.repo({ref: sha}),
     (response) => response.data,
   );
   core.debug(`checkRuns: ${JSON.stringify(checkRuns)}`)
-  const checkNames: Record<string, string> = {};
+  const checkNames: Record<string, CheckRunData> = {};
   checkRuns.forEach(
-    (checkRun: any) => {
-      const conclusion = checkRun.conclusion ? checkRun.conclusion : "pending";
-      checkNames[checkRun.name] = conclusion;
+    (checkRun) => {
+      const checkRunData: CheckRunData = {
+        name: checkRun.name,
+        status: checkRun.status,
+        conclusion: checkRun.conclusion,
+        details_url: checkRun.details_url
+      }
+      checkNames[checkRun.name] = checkRunData;
     },
   );
   return checkNames;
@@ -148,10 +168,10 @@ const collectExpectedChecks = (configs: SubProjConfig[]): Record<string, string[
   const requiredChecks: Record<string, string[]> = {};
   configs.forEach((config) => {
     config.checks.forEach((check) => {
-      if (check.id in requiredChecks) {
-        requiredChecks[check.id].push(config.id)
+      if (check in requiredChecks) {
+        requiredChecks[check].push(config.id)
       } else {
-        requiredChecks[check.id] = [config.id]
+        requiredChecks[check] = [config.id]
       }
     });
   });

@@ -2,41 +2,6 @@
  * Check Group data types
  * @module CheckGroupTypes
  */
-
-/**
- * The status of the current running checks
- * which will then be converted to the report
- * posted on the check.
- */
-export interface ProgressReport {
-  completed?: string[];
-  expected?: string[];
-  failed?: string[];
-  missing?: string[];
-  needAction?: string[];
-  running?: string[];
-  succeeded?: string[];
-}
-
-export interface SubProjCheck {
-  /**
-   * The ID of the check which should
-   * match how they are posted on GitHub.
-   */
-  id: string;
-  /**
-   * If the check has been satified.
-   *
-   * Note: This field should get filled when the
-   * app is analyzing the pull requests.
-   */
-  satisfied?: boolean;
-  /**
-   * The currently posted status of the check.
-   */
-  status?: string;
-}
-
 export interface SubProjConfig {
   /**
    * The ID for the sub-project
@@ -53,7 +18,7 @@ export interface SubProjConfig {
    * are expected to pass for
    * the sub-project.
    */
-  checks: SubProjCheck[];
+  checks: string[];
 }
 
 export interface CheckGroupConfig {
@@ -75,9 +40,12 @@ export interface CheckGroupConfig {
  * The result of the processing pipeline.
  */
 export type CheckResult = 'all_passing' | 'has_failure' | 'pending';
+export type Conclusion =  "success" | "failure" | "neutral" | "cancelled" | "skipped" | "timed_out" | "action_required" | null;
+export type Status = "completed" | "in_progress" | "queued";
 
 export interface CheckRunData {
   name: string;
-  status: string;
-  conclusion: string | undefined;
+  status: Status;
+  conclusion: Conclusion;
+  details_url: string;
 }

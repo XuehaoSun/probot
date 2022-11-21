@@ -1,7 +1,4 @@
 "use strict";
-/**
- * @module Core
- */
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     var desc = Object.getOwnPropertyDescriptor(m, k);
@@ -63,12 +60,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchConfig = exports.CheckGroup = void 0;
-var utils_1 = require("../utils");
+/**
+ * @module Core
+ */
 var core = __importStar(require("@actions/core"));
+var generate_progress_1 = require("./generate_progress");
+var subproj_matching_1 = require("./subproj_matching");
+var satisfy_expected_checks_1 = require("./satisfy_expected_checks");
 var config_getter_1 = require("./config_getter");
 Object.defineProperty(exports, "fetchConfig", { enumerable: true, get: function () { return config_getter_1.fetchConfig; } });
-var utils_2 = require("../utils");
-var utils_3 = require("../utils");
 /**
  * The orchestration class.
  */
@@ -76,6 +76,7 @@ var CheckGroup = /** @class */ (function () {
     function CheckGroup(pullRequestNumber, config, context, sha) {
         this.intervalTimer = setTimeout(function () { return ''; }, 0);
         this.timeoutTimer = setTimeout(function () { return ''; }, 0);
+        this.inputs = {};
         this.pullRequestNumber = pullRequestNumber;
         this.config = config;
         this.context = context;
@@ -83,7 +84,7 @@ var CheckGroup = /** @class */ (function () {
     }
     CheckGroup.prototype.run = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var filenames, subprojs, expectedChecks, interval, timeout;
+            var filenames, subprojs, expectedChecks, maintainers, owner, interval, timeout;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -91,24 +92,30 @@ var CheckGroup = /** @class */ (function () {
                     case 1:
                         filenames = _a.sent();
                         core.info("Files are: ".concat(JSON.stringify(filenames)));
-                        subprojs = (0, utils_2.matchFilenamesToSubprojects)(filenames, this.config.subProjects);
+                        subprojs = (0, subproj_matching_1.matchFilenamesToSubprojects)(filenames, this.config.subProjects);
                         core.debug("Matching subprojects are: ".concat(JSON.stringify(subprojs)));
                         if (core.isDebug()) {
                             expectedChecks = collectExpectedChecks(subprojs);
                             core.debug("Expected checks are: ".concat(JSON.stringify(expectedChecks)));
                         }
+                        maintainers = core.getInput('maintainers');
+                        this.inputs.maintainers = maintainers;
+                        owner = core.getInput('owner');
+                        this.inputs.owner = owner;
                         interval = parseInt(core.getInput('interval'));
+                        this.inputs.interval = interval;
                         core.info("Check interval: ".concat(interval));
                         this.runCheck(subprojs, 1, interval * 1000);
                         timeout = parseInt(core.getInput('timeout'));
+                        this.inputs.timeout = timeout;
                         core.info("Timeout: ".concat(timeout));
                         // set a timeout that will stop the job to avoid polling the GitHub API infinitely
                         this.timeoutTimer = setTimeout(function () {
                             clearTimeout(_this.intervalTimer);
                             core.setFailed("The timeout of ".concat(timeout, " minutes has triggered but not all required jobs were passing.")
                                 + " This job will need to be re-run to merge your PR."
-                                + " If you do not have write access to the repository you can ask ".concat(core.getInput('maintainers'), " to re-run it for you.")
-                                + " If you have any other questions, you can reach out to ".concat(core.getInput('owner'), " for help."));
+                                + " If you do not have write access to the repository you can ask ".concat(maintainers, " to re-run it for you.")
+                                + " If you have any other questions, you can reach out to ".concat(owner, " for help."));
                         }, timeout * 60 * 1000);
                         return [2 /*return*/];
                 }
@@ -117,7 +124,7 @@ var CheckGroup = /** @class */ (function () {
     };
     CheckGroup.prototype.runCheck = function (subprojs, tries, interval) {
         return __awaiter(this, void 0, void 0, function () {
-            var postedChecks, conclusion, summary, details, error_1;
+            var postedChecks, result, error_1;
             var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -129,12 +136,10 @@ var CheckGroup = /** @class */ (function () {
                     case 1:
                         postedChecks = _a.sent();
                         core.debug("postedChecks: ".concat(JSON.stringify(postedChecks)));
-                        conclusion = (0, utils_3.satisfyExpectedChecks)(subprojs, postedChecks);
-                        summary = (0, utils_1.generateProgressSummary)(subprojs, postedChecks);
-                        details = (0, utils_1.generateProgressDetails)(subprojs, postedChecks);
-                        core.info("".concat(this.config.customServiceName, " conclusion: '").concat(conclusion, "':\n").concat(summary, "\n").concat(details));
+                        result = (0, satisfy_expected_checks_1.satisfyExpectedChecks)(subprojs, postedChecks);
+                        this.notifyProgress(subprojs, postedChecks, result);
                         core.endGroup();
-                        if (conclusion === "all_passing") {
+                        if (result === "all_passing") {
                             core.info("All required checks were successful!");
                             clearTimeout(this.intervalTimer);
                             clearTimeout(this.timeoutTimer);
@@ -152,6 +157,17 @@ var CheckGroup = /** @class */ (function () {
                         return [3 /*break*/, 3];
                     case 3: return [2 /*return*/];
                 }
+            });
+        });
+    };
+    CheckGroup.prototype.notifyProgress = function (subprojs, postedChecks, result) {
+        return __awaiter(this, void 0, void 0, function () {
+            var details;
+            return __generator(this, function (_a) {
+                details = (0, generate_progress_1.generateProgressDetailsCLI)(subprojs, postedChecks);
+                core.info("".concat(this.config.customServiceName, " result: '").concat(result, "':\n").concat(details));
+                (0, generate_progress_1.commentOnPr)(this.context, result, this.inputs, subprojs, postedChecks);
+                return [2 /*return*/];
             });
         });
     };
@@ -193,8 +209,13 @@ var getPostedChecks = function (context, sha) { return __awaiter(void 0, void 0,
                 core.debug("checkRuns: ".concat(JSON.stringify(checkRuns)));
                 checkNames = {};
                 checkRuns.forEach(function (checkRun) {
-                    var conclusion = checkRun.conclusion ? checkRun.conclusion : "pending";
-                    checkNames[checkRun.name] = conclusion;
+                    var checkRunData = {
+                        name: checkRun.name,
+                        status: checkRun.status,
+                        conclusion: checkRun.conclusion,
+                        details_url: checkRun.details_url
+                    };
+                    checkNames[checkRun.name] = checkRunData;
                 });
                 return [2 /*return*/, checkNames];
         }
@@ -205,11 +226,11 @@ var collectExpectedChecks = function (configs) {
     var requiredChecks = {};
     configs.forEach(function (config) {
         config.checks.forEach(function (check) {
-            if (check.id in requiredChecks) {
-                requiredChecks[check.id].push(config.id);
+            if (check in requiredChecks) {
+                requiredChecks[check].push(config.id);
             }
             else {
-                requiredChecks[check.id] = [config.id];
+                requiredChecks[check] = [config.id];
             }
         });
     });
