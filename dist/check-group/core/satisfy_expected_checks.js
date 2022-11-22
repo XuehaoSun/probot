@@ -1,41 +1,55 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.satisfyExpectedChecks = void 0;
-/* eslint-enable @typescript-eslint/no-unused-vars */
-/**
- * Checks if all the sub-project requirements are satisfied.
- *
- * @param subProjs The sub-projects a certain pull request
- * matches.
- *
- * @param checksStatusLookup The checks that has already
- * posted progresses. The key is the check ID and the value
- * is the current check status.
- *
- * @returns The current result of checks fulfillment.
- * * "all_passing" means all required checks post
- *   success conclusion.
- * * "has_failure" means at least one of the required
- *   checks failed.
- * * "pending" means there is no failure but some
- *   checks are pending or missing.
- */
-var satisfyExpectedChecks = function (subProjs, postedChecks) {
+exports.getSubProjResult = exports.getChecksResult = void 0;
+var getChecksResult = function (checks, postedChecks) {
     var result = "all_passing";
-    subProjs.forEach(function (subProj) {
-        subProj.checks.forEach(function (check) {
-            if (check in postedChecks &&
-                postedChecks[check].conclusion !== "success" &&
-                postedChecks[check].conclusion !== null) {
-                result = "has_failure";
-            }
-            if ((!(check in postedChecks) ||
-                postedChecks[check].conclusion === null) &&
-                result !== "has_failure") {
+    for (var _i = 0, checks_1 = checks; _i < checks_1.length; _i++) {
+        var check = checks_1[_i];
+        if (check in postedChecks) {
+            var conclusion = postedChecks[check].conclusion;
+            if (conclusion === null) {
+                // the check is in progress
                 result = "pending";
             }
-        });
-    });
+            else if (conclusion !== "success") {
+                // the check already failed
+                return "has_failure";
+            }
+        }
+        else {
+            // the check is missing, hopefully queued
+            result = "pending";
+        }
+    }
+    ;
     return result;
 };
-exports.satisfyExpectedChecks = satisfyExpectedChecks;
+exports.getChecksResult = getChecksResult;
+var getSubProjResult = function (subProjs, postedChecks) {
+    var result = "all_passing";
+    for (var _i = 0, subProjs_1 = subProjs; _i < subProjs_1.length; _i++) {
+        var subProj = subProjs_1[_i];
+        for (var _a = 0, _b = subProj.checks; _a < _b.length; _a++) {
+            var check = _b[_a];
+            if (check in postedChecks) {
+                var conclusion = postedChecks[check].conclusion;
+                if (conclusion === null) {
+                    // the check is in progress
+                    result = "pending";
+                }
+                else if (conclusion !== "success") {
+                    // the check already failed
+                    return "has_failure";
+                }
+            }
+            else {
+                // the check is missing, hopefully queued
+                result = "pending";
+            }
+        }
+        ;
+    }
+    ;
+    return result;
+};
+exports.getSubProjResult = getSubProjResult;
