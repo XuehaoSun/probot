@@ -91,8 +91,8 @@ export class CheckGroup {
       this.notifyProgress(subprojs, postedChecks, result)
       core.endGroup();
     
-      if (result === "all_passing") {
-        core.info("All required checks were successful!")
+      if (result !== "pending") {
+        core.info("All required checks were finished!")
         clearTimeout(this.intervalTimer)
         clearTimeout(this.timeoutTimer)
       } else {

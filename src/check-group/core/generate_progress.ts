@@ -2,6 +2,10 @@ import { CheckResult, CheckRunData, SubProjConfig } from "../types";
 import { Context } from "probot";
 import { getChecksResult } from "./satisfy_expected_checks";
 
+import axios from 'axios';
+import { getArtifactName } from "./config_getter";
+import { fetchTableData } from "./parse_artifact";
+
 
 const statusToMark = (
   check: string,
@@ -27,7 +31,7 @@ const statusToMark = (
 const statusToLink = (
   check: string,
   postedChecks: Record<string, CheckRunData>,
-): string  => {
+): string => {
   if (check in postedChecks) {
     const checkData = postedChecks[check]
     // assert(checkData.name === check)
@@ -41,16 +45,39 @@ const statusToLink = (
 const parseStatus = (
   check: string,
   postedChecks: Record<string, CheckRunData>,
-): string  => {
+): string => {
   if (check in postedChecks) {
     const checkData = postedChecks[check]
     if (checkData.conclusion === null) {
-      return checkData.status        
+      return checkData.status
     } else {
       return checkData.conclusion
     }
   }
   return "no_status"
+}
+
+async function parseDownloadUrl(buildId: string): Promise<{ [name: string]: string }> {
+  const azureArtifactApiUrl = `https://dev.azure.com/lpot-inc/neural-compressor/_apis/build/builds/${buildId}/artifacts?api-version=5.1`;
+
+  try {
+    const response = await axios.get(azureArtifactApiUrl);
+    const azureArtifactsData = response.data;
+    const artifactCount = azureArtifactsData.count;
+    const artifactValue = azureArtifactsData.value;
+
+    const urlDict: { [name: string]: string } = {};
+
+    for (const item of artifactValue) {
+      const artifactDownloadUrl = `${item.resource.downloadUrl.slice(0, -3)}file&subPath=%2F`;
+      urlDict[item.name] = artifactDownloadUrl;
+    }
+
+    return urlDict;
+  } catch (error) {
+    console.error('Error fetching Azure artifact information:', error);
+    return {};
+  }
 }
 
 export const generateProgressDetailsCLI = (
@@ -104,14 +131,25 @@ export const generateProgressDetailsMarkdown = (
     // generate the markdown table
     progress += "<details>\n\n"
     progress += `<summary><b>${subprojectEmoji} ${subproject.id}</b></summary>\n\n`;
-    progress += "| Check ID | Status |     |\n";
-    progress += "| -------- | ------ | --- |\n";
+    progress += "| Check ID | Status | link |     |\n";
+    progress += "| -------- | ------ | ---- | --- |\n";
     subproject.checks.forEach((check) => {
       const link = statusToLink(check, postedChecks);
       const status = parseStatus(check, postedChecks);
       const mark = statusToMark(check, postedChecks);
-      progress += `| ${link} | ${status} | ${mark} |\n`;
+      let artifactLink = parseDownloadUrl(postedChecks[check].details_url)
+      artifactLink = artifactLink[`${getArtifactName(check)}`]
+      progress += `| ${link} | ${status} | [artifact](${artifactLink}) | ${mark} |\n`;
     })
+    const url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
+    fetchTableData(url)
+      .then(tableData => {
+        progress += `| ${tableData} |`
+        console.log('Table Data:', tableData);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
     progress += "\n</details>\n\n";
   });
@@ -130,8 +168,8 @@ function formPrComment(
   // capitalize
   parsedConclusion = parsedConclusion.charAt(0).toUpperCase() + parsedConclusion.slice(1);
   const hasFailed = result === "has_failure"
-  const conclusionEmoji = (result === "all_passing") ? "🟢": (hasFailed) ? "🔴" : "🟡"
-  const lightning = (result === "all_passing") ? "⚡": (hasFailed) ? "⛈️" : "🌩️"
+  const conclusionEmoji = (result === "all_passing") ? "🟢" : (hasFailed) ? "🔴" : "🟡"
+  const lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️"
   const failedMesage = (
     `> **Warning**\n> This job will need to be re-run to merge your PR.`
     + ` If you do not have write access to the repository, you can ask \`${inputs.maintainers}\` to re-run it.`
@@ -150,15 +188,15 @@ function formPrComment(
   )
 }
 
-async function getPrComment(context: Context): Promise<{id: number; body: string}> {
+async function getPrComment(context: Context): Promise<{ id: number; body: string }> {
   const params = context.issue()
   const commentsRes = await context.octokit.rest.issues.listComments(params);
   for (const comment of commentsRes.data) {
     if (comment.body!.includes(PR_COMMENT_START)) {
-      return {id: comment.id, body: comment.body!};
+      return { id: comment.id, body: comment.body! };
     }
   }
-  return {id: 0, body: ""};
+  return { id: 0, body: "" };
 }
 
 
@@ -176,10 +214,10 @@ export async function commentOnPr(
     return;
   }
   if (existingData.id === 0) {
-    await context.octokit.issues.createComment(context.issue({body: newComment}));
+    await context.octokit.issues.createComment(context.issue({ body: newComment }));
   } else {
     await context.octokit.issues.updateComment(
-      context.repo({body: newComment, comment_id: existingData.id})
+      context.repo({ body: newComment, comment_id: existingData.id })
     );
   }
 }

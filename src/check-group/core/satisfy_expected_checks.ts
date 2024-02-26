@@ -7,7 +7,7 @@ export const getChecksResult = (
   let result: CheckResult = "all_passing";
   for (const check of checks) {
     if (check in postedChecks) {
-      const conclusion = postedChecks[check].conclusion; 
+      const conclusion = postedChecks[check].conclusion;
       if (conclusion === null) {
         // the check is in progress
         result = "pending";
@@ -28,16 +28,17 @@ export const getSubProjResult = (
   postedChecks: Record<string, CheckRunData>,
 ): CheckResult => {
   let result: CheckResult = "all_passing";
+  let hasFailure: boolean = false;
   for (const subProj of subProjs) {
     for (const check of subProj.checks) {
       if (check in postedChecks) {
-        const conclusion = postedChecks[check].conclusion; 
+        const conclusion = postedChecks[check].conclusion;
         if (conclusion === null) {
           // the check is in progress
           result = "pending";
         } else if (conclusion !== "success") {
           // the check already failed
-          return "has_failure";
+          hasFailure = true;
         }
       } else {
         // the check is missing, hopefully queued
@@ -45,5 +46,8 @@ export const getSubProjResult = (
       }
     };
   };
+  if (hasFailure) {
+    return "has_failure";
+  }
   return result;
 };

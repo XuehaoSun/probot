@@ -29,9 +29,24 @@ export const fetchConfig = async (context: Context): Promise<CheckGroupConfig> =
   return parseUserConfig(configData);
 };
 
+export const getArtifactName = (check: String): String => {
+  return dict[`${check}`]
+}
+
+interface Dictionary<T> {
+  [key: string]: T;
+}
+
+const dict: Dictionary<string> = {
+  "Code-Scan (Bandit Code Scan Bandit)": "bandit/bindit.log",
+  "Code-Scan (DocStyle Code Scan DocStyle)": "pydocstyle/pydocstyle.log",
+  "Code-Scan (Pylint Code Scan Pylint)": "pylint/pylint.json",
+  "Model-Test": "FinalReport/report.html",
+}
+
 const readConfig = async (context: Context, branch: string): Promise<Record<string, unknown>> => {
-  const params = context.repo({path: '.github/checkgroup.yml'})
+  const params = context.repo({ path: '.github/checkgroup.yml' })
   // https://github.com/probot/octokit-plugin-config
-  const { config } = await context.octokit.config.get({...params, branch: branch})
+  const { config } = await context.octokit.config.get({ ...params, branch: branch })
   return config
 }
