@@ -141,8 +141,8 @@ var CheckGroup = /** @class */ (function () {
                         result = (0, satisfy_expected_checks_1.getSubProjResult)(subprojs, postedChecks);
                         this.notifyProgress(subprojs, postedChecks, result);
                         core.endGroup();
-                        if (result === "all_passing") {
-                            core.info("All required checks were successful!");
+                        if (result !== "pending") {
+                            core.info("All required checks were finished!");
                             clearTimeout(this.intervalTimer);
                             clearTimeout(this.timeoutTimer);
                         }

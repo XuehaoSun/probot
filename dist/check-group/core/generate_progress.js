@@ -35,9 +35,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commentOnPr = exports.generateProgressDetailsMarkdown = exports.generateProgressDetailsCLI = void 0;
 var satisfy_expected_checks_1 = require("./satisfy_expected_checks");
+var axios_1 = __importDefault(require("axios"));
+var parse_artifact_1 = require("./parse_artifact");
 var statusToMark = function (check, postedChecks) {
     if (check in postedChecks) {
         if (postedChecks[check].conclusion === "success") {
@@ -77,6 +82,38 @@ var parseStatus = function (check, postedChecks) {
     }
     return "no_status";
 };
+function parseDownloadUrl(buildId) {
+    return __awaiter(this, void 0, void 0, function () {
+        var azureArtifactApiUrl, response, azureArtifactsData, artifactCount, artifactValue, urlDict, _i, artifactValue_1, item, artifactDownloadUrl, error_1;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    azureArtifactApiUrl = "https://dev.azure.com/lpot-inc/neural-compressor/_apis/build/builds/".concat(buildId, "/artifacts?api-version=5.1");
+                    _a.label = 1;
+                case 1:
+                    _a.trys.push([1, 3, , 4]);
+                    return [4 /*yield*/, axios_1.default.get(azureArtifactApiUrl)];
+                case 2:
+                    response = _a.sent();
+                    azureArtifactsData = response.data;
+                    artifactCount = azureArtifactsData.count;
+                    artifactValue = azureArtifactsData.value;
+                    urlDict = {};
+                    for (_i = 0, artifactValue_1 = artifactValue; _i < artifactValue_1.length; _i++) {
+                        item = artifactValue_1[_i];
+                        artifactDownloadUrl = "".concat(item.resource.downloadUrl.slice(0, -3), "file&subPath=%2F");
+                        urlDict[item.name] = artifactDownloadUrl;
+                    }
+                    return [2 /*return*/, urlDict];
+                case 3:
+                    error_1 = _a.sent();
+                    console.error('Error fetching Azure artifact information:', error_1);
+                    return [2 /*return*/, {}];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
 var generateProgressDetailsCLI = function (subprojects, postedChecks) {
     var progress = "";
     // these are the required subprojects
@@ -121,16 +158,28 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) {
         // generate the markdown table
         progress += "<details>\n\n";
         progress += "<summary><b>".concat(subprojectEmoji, " ").concat(subproject.id, "</b></summary>\n\n");
-        progress += "| Check ID | Status |     |\n";
-        progress += "| -------- | ------ | --- |\n";
+        progress += "| Check ID | Status | link |     |\n";
+        progress += "| -------- | ------ | ---- | --- |\n";
         subproject.checks.forEach(function (check) {
             var link = statusToLink(check, postedChecks);
             var status = parseStatus(check, postedChecks);
             var mark = statusToMark(check, postedChecks);
-            progress += "| ".concat(link, " | ").concat(status, " | ").concat(mark, " |\n");
+            // let artifactLink = parseDownloadUrl(postedChecks[check].details_url)
+            // artifactLink = artifactLink[`${getArtifactName(check)}`]
+            var artifactLink = "www.google.com";
+            progress += "| ".concat(link, " | ").concat(status, " | [artifact](").concat(artifactLink, ") | ").concat(mark, " |\n");
         });
-        progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
-        progress += "\n</details>\n\n";
+        var url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
+        (0, parse_artifact_1.fetchTableData)(url)
+            .then(function (tableData) {
+            progress += "| ".concat(tableData, " |");
+            progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
+            progress += "\n</details>\n\n";
+            console.log('Table Data:', tableData);
+        })
+            .catch(function (error) {
+            console.error('Error:', error);
+        });
     });
     return progress;
 };

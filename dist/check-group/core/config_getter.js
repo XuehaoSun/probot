@@ -70,7 +70,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchConfig = void 0;
+exports.getArtifactName = exports.fetchConfig = void 0;
 var user_config_parser_1 = require("./user_config_parser");
 var core = __importStar(require("@actions/core"));
 /**
@@ -110,6 +110,16 @@ var fetchConfig = function (context) { return __awaiter(void 0, void 0, void 0, 
     });
 }); };
 exports.fetchConfig = fetchConfig;
+var getArtifactName = function (check) {
+    return dict["".concat(check)];
+};
+exports.getArtifactName = getArtifactName;
+var dict = {
+    "Code-Scan (Bandit Code Scan Bandit)": "bandit/bindit.log",
+    "Code-Scan (DocStyle Code Scan DocStyle)": "pydocstyle/pydocstyle.log",
+    "Code-Scan (Pylint Code Scan Pylint)": "pylint/pylint.json",
+    "Model-Test": "FinalReport/report.html",
+};
 var readConfig = function (context, branch) { return __awaiter(void 0, void 0, void 0, function () {
     var params, config;
     return __generator(this, function (_a) {
