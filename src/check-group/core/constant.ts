@@ -1,4 +1,4 @@
-const artifactDict: { [key: string]: { id: string, name: string } } = {
+export const artifactDict: { [key: string]: { id: string, name: string } } = {
   "Code-Scan (Bandit Code Scan Bandit)": { id: "bandit", name: "bandit.log" },
   "Code-Scan (DocStyle Code Scan DocStyle)": { id: "pydocstyle", name: "pydocstyle.log" },
   "Code-Scan (Pylint Code Scan Pylint)": { id: "pylint", name: "pylint.json" },

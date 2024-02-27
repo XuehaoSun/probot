@@ -72,6 +72,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getArtifactName = exports.fetchConfig = void 0;
 var user_config_parser_1 = require("./user_config_parser");
+var constant_1 = require("./constant");
 var core = __importStar(require("@actions/core"));
 /**
  * Fetches the app configuration from the user's repository.
@@ -111,8 +112,8 @@ var fetchConfig = function (context) { return __awaiter(void 0, void 0, void 0, 
 }); };
 exports.fetchConfig = fetchConfig;
 var getArtifactName = function (check, urlDict) {
-    if (artifactDict["".concat(check)] !== undefined) {
-        var _a = [artifactDict["".concat(check)].id, artifactDict["".concat(check)].name], id = _a[0], name_1 = _a[1];
+    if (constant_1.artifactDict["".concat(check)] !== undefined) {
+        var _a = [constant_1.artifactDict["".concat(check)].id, constant_1.artifactDict["".concat(check)].name], id = _a[0], name_1 = _a[1];
         return "".concat(urlDict[id]).concat(name_1);
     }
     else {

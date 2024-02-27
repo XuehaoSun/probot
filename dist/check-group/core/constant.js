@@ -1,4 +1,7 @@
-var artifactDict = {
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.artifactDict = void 0;
+exports.artifactDict = {
     "Code-Scan (Bandit Code Scan Bandit)": { id: "bandit", name: "bandit.log" },
     "Code-Scan (DocStyle Code Scan DocStyle)": { id: "pydocstyle", name: "pydocstyle.log" },
     "Code-Scan (Pylint Code Scan Pylint)": { id: "pylint", name: "pylint.json" },

@@ -2,6 +2,7 @@ import { CheckGroupConfig } from "../types";
 import { Context } from "probot";
 import { parseUserConfig } from "./user_config_parser";
 import { PullRequestEvent } from '@octokit/webhooks-types';
+import { artifactDict } from './constant';
 import * as core from '@actions/core'
 
 /**
