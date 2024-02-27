@@ -84,12 +84,22 @@ var parseStatus = function (check, postedChecks) {
 };
 function parseDownloadUrl(detailURL) {
     return __awaiter(this, void 0, void 0, function () {
-        var azureArtifactApiUrl, response, azureArtifactsData, artifactCount, artifactValue, urlDict, _i, artifactValue_1, item, artifactDownloadUrl, error_1;
+        var regex, match, buildId, azureArtifactApiUrl, response, azureArtifactsData, artifactCount, artifactValue, urlDict, _i, artifactValue_1, item, artifactDownloadUrl, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    azureArtifactApiUrl = "".concat(detailURL, "/artifacts?api-version=5.1");
-                    console.log(azureArtifactApiUrl);
+                    regex = /buildId=(\d+)/;
+                    match = detailURL.match(regex);
+                    buildId = "";
+                    if (match && match.length > 1) {
+                        buildId = match[1];
+                        console.log("Build ID:", buildId);
+                    }
+                    else {
+                        console.log("Build ID not found in URL");
+                        return [2 /*return*/, {}];
+                    }
+                    azureArtifactApiUrl = "https://dev.azure.com/lpot-inc/neural-compressor/_apis/build/builds/".concat(buildId, "/artifacts?api-version=5.1");
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);

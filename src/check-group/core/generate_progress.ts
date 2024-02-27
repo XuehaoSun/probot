@@ -58,8 +58,19 @@ const parseStatus = (
 }
 
 async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: string }> {
-  const azureArtifactApiUrl = `${detailURL}/artifacts?api-version=5.1`;
-  console.log(azureArtifactApiUrl);
+  const regex = /buildId=(\d+)/;
+  const match = detailURL.match(regex);
+  let buildId: string =""
+
+  if (match && match.length > 1) {
+    buildId = match[1];
+    console.log("Build ID:", buildId);
+  } else {
+    console.log("Build ID not found in URL");
+    return {};
+  }
+
+  const azureArtifactApiUrl = `https://dev.azure.com/lpot-inc/neural-compressor/_apis/build/builds/${buildId}/artifacts?api-version=5.1`;
 
   try {
     const response = await axios.get(azureArtifactApiUrl);
