@@ -59,9 +59,11 @@ const parseStatus = (
 
 async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: string }> {
   const azureArtifactApiUrl = `${detailURL}/artifacts?api-version=5.1`;
+  console.log(azureArtifactApiUrl);
 
   try {
     const response = await axios.get(azureArtifactApiUrl);
+    console.log(response);
     const azureArtifactsData = response.data;
     const artifactCount = azureArtifactsData.count;
     const artifactValue = azureArtifactsData.value;

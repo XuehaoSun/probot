@@ -89,12 +89,14 @@ function parseDownloadUrl(detailURL) {
             switch (_a.label) {
                 case 0:
                     azureArtifactApiUrl = "".concat(detailURL, "/artifacts?api-version=5.1");
+                    console.log(azureArtifactApiUrl);
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, axios_1.default.get(azureArtifactApiUrl)];
                 case 2:
                     response = _a.sent();
+                    console.log(response);
                     azureArtifactsData = response.data;
                     artifactCount = azureArtifactsData.count;
                     artifactValue = azureArtifactsData.value;
