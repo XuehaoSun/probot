@@ -29,19 +29,19 @@ export const fetchConfig = async (context: Context): Promise<CheckGroupConfig> =
   return parseUserConfig(configData);
 };
 
-export const getArtifactName = (check: String): String => {
-  return dict[`${check}`]
+export const getArtifactName = (check: String, urlDict:{ [name: string]: string }): String | undefined => {
+  if (dict[`${check}`] !== undefined) {
+    let [id, name] = [dict[`${check}`].id, dict[`${check}`].name]
+    return `${urlDict[id]} + ${name}`
+  } else {
+    return undefined
+  }
 }
 
-interface Dictionary<T> {
-  [key: string]: T;
-}
-
-const dict: Dictionary<string> = {
-  "Code-Scan (Bandit Code Scan Bandit)": "bandit/bindit.log",
-  "Code-Scan (DocStyle Code Scan DocStyle)": "pydocstyle/pydocstyle.log",
-  "Code-Scan (Pylint Code Scan Pylint)": "pylint/pylint.json",
-  "Model-Test": "FinalReport/report.html",
+const dict: { [key: string]: { id: string, name: string } } = {
+  "Code-Scan (Bandit Code Scan Bandit)": { id: "bandit", name: "bindit.log" },
+  "Code-Scan (DocStyle Code Scan DocStyle)": { id: "pydocstyle", name: "pydocstyle.log" },
+  "Code-Scan (Pylint Code Scan Pylint)": { id: "pylint", name: "pylint.json" },
 }
 
 const readConfig = async (context: Context, branch: string): Promise<Record<string, unknown>> => {

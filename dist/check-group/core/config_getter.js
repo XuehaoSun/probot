@@ -110,15 +110,20 @@ var fetchConfig = function (context) { return __awaiter(void 0, void 0, void 0, 
     });
 }); };
 exports.fetchConfig = fetchConfig;
-var getArtifactName = function (check) {
-    return dict["".concat(check)];
+var getArtifactName = function (check, urlDict) {
+    if (dict["".concat(check)] !== undefined) {
+        var _a = [dict["".concat(check)].id, dict["".concat(check)].name], id = _a[0], name_1 = _a[1];
+        return "".concat(urlDict[id], " + ").concat(name_1);
+    }
+    else {
+        return undefined;
+    }
 };
 exports.getArtifactName = getArtifactName;
 var dict = {
-    "Code-Scan (Bandit Code Scan Bandit)": "bandit/bindit.log",
-    "Code-Scan (DocStyle Code Scan DocStyle)": "pydocstyle/pydocstyle.log",
-    "Code-Scan (Pylint Code Scan Pylint)": "pylint/pylint.json",
-    "Model-Test": "FinalReport/report.html",
+    "Code-Scan (Bandit Code Scan Bandit)": { id: "bandit", name: "bindit.log" },
+    "Code-Scan (DocStyle Code Scan DocStyle)": { id: "pydocstyle", name: "pydocstyle.log" },
+    "Code-Scan (Pylint Code Scan Pylint)": { id: "pylint", name: "pylint.json" },
 };
 var readConfig = function (context, branch) { return __awaiter(void 0, void 0, void 0, function () {
     var params, config;

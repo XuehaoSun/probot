@@ -119,8 +119,7 @@ export const generateProgressDetailsMarkdown = async (
   postedChecks: Record<string, CheckRunData>,
 ): Promise<string> => {
   let progress = "## Groups summary\n\n";
-  const promises: Promise<any>[] = [];
-  subprojects.forEach((subproject) => {
+  subprojects.forEach(async (subproject) => {
     // get the aggregated status of all statuses in the subproject
     const checkResult = getChecksResult(subproject.checks, postedChecks)
     let subprojectEmoji = "🟡";
@@ -134,30 +133,36 @@ export const generateProgressDetailsMarkdown = async (
     progress += `<summary><b>${subprojectEmoji} ${subproject.id}</b></summary>\n\n`;
     progress += "| Check ID | Status | link |     |\n";
     progress += "| -------- | ------ | ---- | --- |\n";
-    subproject.checks.forEach((check) => {
+
+    subproject.checks.forEach(async (check) => {
       const link = statusToLink(check, postedChecks);
       const status = parseStatus(check, postedChecks);
       const mark = statusToMark(check, postedChecks);
-      // let artifactLink = parseDownloadUrl(postedChecks[check].details_url)
-      // artifactLink = artifactLink[`${getArtifactName(check)}`]
-      let artifactLink = "www.google.com"
-      progress += `| ${link} | ${status} | [artifact](${artifactLink}) | ${mark} |\n`;
+      if (status === "success" || status === "failure") {
+        const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url)
+        const artifactLink = getArtifactName(check, artifactLinkDict)
+        if (artifactLink === undefined) {
+          progress += `| ${link} | ${status} |  | ${mark} |\n`;
+        } else {
+          progress += `| ${link} | ${status} | [artifact](${artifactLink}) | ${mark} |\n`;
+        }
+      } else {
+        progress += `| ${link} | ${status} |  | ${mark} |\n`;
+      }
     })
-    const url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
-    promises.push(
-      fetchTableData(url)
-        .then(tableData => {
-          progress += `| ${tableData} |`
-          progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
-          progress += "\n</details>\n\n";
-          console.log('Table Data:', tableData);
-        })
-        .catch(error => {
-          console.error('Error:', error);
-        })
-    );
+
+    // if (subproject.id == "Unit Tests basic workflow") {
+    //   const url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
+    //   try {
+    //     const tableData = await fetchTableData(url);
+    //     progress += `| ${tableData} |`
+    //   } catch (error) {
+    //     console.error('Error:', error);
+    //   }
+    // }
+    progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
+    progress += "\n</details>\n\n";
   });
-  await Promise.all(promises);
   return progress;
 };
 
