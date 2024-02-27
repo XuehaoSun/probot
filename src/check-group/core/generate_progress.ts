@@ -163,12 +163,12 @@ export const generateProgressDetailsMarkdown = async (
 
 const PR_COMMENT_START = "<!-- checkgroup-comment-start -->";
 
-function formPrComment(
+async function formPrComment(
   result: CheckResult,
   inputs: Record<string, any>,
   subprojects: SubProjConfig[],
   postedChecks: Record<string, CheckRunData>
-): string {
+): Promise<string> {
   let parsedConclusion = result.replace("_", " ")
   // capitalize
   parsedConclusion = parsedConclusion.charAt(0).toUpperCase() + parsedConclusion.slice(1);
@@ -180,7 +180,8 @@ function formPrComment(
     + ` If you do not have write access to the repository, you can ask \`${inputs.maintainers}\` to re-run it.`
     + " If you push a new commit, all of CI will re-trigger.\n\n"
   )
-  const progressDetails = generateProgressDetailsMarkdown(subprojects, postedChecks)
+
+  const progressDetails = await generateProgressDetailsMarkdown(subprojects, postedChecks)
   return (
     PR_COMMENT_START
     + `\n# ${lightning} Required checks status: ${parsedConclusion} ${conclusionEmoji}\n\n`
@@ -204,7 +205,6 @@ async function getPrComment(context: Context): Promise<{ id: number; body: strin
   return { id: 0, body: "" };
 }
 
-
 export async function commentOnPr(
   context: Context,
   result: CheckResult,
@@ -214,7 +214,7 @@ export async function commentOnPr(
 ) {
   const existingData = await getPrComment(context);
   context.log.debug(`existingData: ${JSON.stringify(existingData)}`)
-  const newComment = formPrComment(result, inputs, subprojects, postedChecks);
+  const newComment = await formPrComment(result, inputs, subprojects, postedChecks);
   if (existingData.body === newComment) {
     return;
   }

@@ -196,24 +196,34 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
 exports.generateProgressDetailsMarkdown = generateProgressDetailsMarkdown;
 var PR_COMMENT_START = "<!-- checkgroup-comment-start -->";
 function formPrComment(result, inputs, subprojects, postedChecks) {
-    var parsedConclusion = result.replace("_", " ");
-    // capitalize
-    parsedConclusion = parsedConclusion.charAt(0).toUpperCase() + parsedConclusion.slice(1);
-    var hasFailed = result === "has_failure";
-    var conclusionEmoji = (result === "all_passing") ? "🟢" : (hasFailed) ? "🔴" : "🟡";
-    var lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️";
-    var failedMesage = ("> **Warning**\n> This job will need to be re-run to merge your PR."
-        + " If you do not have write access to the repository, you can ask `".concat(inputs.maintainers, "` to re-run it.")
-        + " If you push a new commit, all of CI will re-trigger.\n\n");
-    var progressDetails = (0, exports.generateProgressDetailsMarkdown)(subprojects, postedChecks);
-    return (PR_COMMENT_START
-        + "\n# ".concat(lightning, " Required checks status: ").concat(parsedConclusion, " ").concat(conclusionEmoji, "\n\n")
-        + ((hasFailed) ? failedMesage : "")
-        + ((subprojects.length) ? progressDetails : "No groups match the files changed in this PR.\n\n")
-        + "---\n\n"
-        + "Thank you for your contribution! 💜\n\n"
-        + "> **Note**\n> This comment is automatically generated and updates for ".concat(inputs.timeout, " minutes every ").concat(inputs.interval, " seconds.")
-        + " If you have any other questions, contact `".concat(inputs.owner, "` for help."));
+    return __awaiter(this, void 0, void 0, function () {
+        var parsedConclusion, hasFailed, conclusionEmoji, lightning, failedMesage, progressDetails;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    parsedConclusion = result.replace("_", " ");
+                    // capitalize
+                    parsedConclusion = parsedConclusion.charAt(0).toUpperCase() + parsedConclusion.slice(1);
+                    hasFailed = result === "has_failure";
+                    conclusionEmoji = (result === "all_passing") ? "🟢" : (hasFailed) ? "🔴" : "🟡";
+                    lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️";
+                    failedMesage = ("> **Warning**\n> This job will need to be re-run to merge your PR."
+                        + " If you do not have write access to the repository, you can ask `".concat(inputs.maintainers, "` to re-run it.")
+                        + " If you push a new commit, all of CI will re-trigger.\n\n");
+                    return [4 /*yield*/, (0, exports.generateProgressDetailsMarkdown)(subprojects, postedChecks)];
+                case 1:
+                    progressDetails = _a.sent();
+                    return [2 /*return*/, (PR_COMMENT_START
+                            + "\n# ".concat(lightning, " Required checks status: ").concat(parsedConclusion, " ").concat(conclusionEmoji, "\n\n")
+                            + ((hasFailed) ? failedMesage : "")
+                            + ((subprojects.length) ? progressDetails : "No groups match the files changed in this PR.\n\n")
+                            + "---\n\n"
+                            + "Thank you for your contribution! 💜\n\n"
+                            + "> **Note**\n> This comment is automatically generated and updates for ".concat(inputs.timeout, " minutes every ").concat(inputs.interval, " seconds.")
+                            + " If you have any other questions, contact `".concat(inputs.owner, "` for help."))];
+            }
+        });
+    });
 }
 function getPrComment(context) {
     return __awaiter(this, void 0, void 0, function () {
@@ -245,20 +255,22 @@ function commentOnPr(context, result, inputs, subprojects, postedChecks) {
                 case 1:
                     existingData = _a.sent();
                     context.log.debug("existingData: ".concat(JSON.stringify(existingData)));
-                    newComment = formPrComment(result, inputs, subprojects, postedChecks);
+                    return [4 /*yield*/, formPrComment(result, inputs, subprojects, postedChecks)];
+                case 2:
+                    newComment = _a.sent();
                     if (existingData.body === newComment) {
                         return [2 /*return*/];
                     }
-                    if (!(existingData.id === 0)) return [3 /*break*/, 3];
+                    if (!(existingData.id === 0)) return [3 /*break*/, 4];
                     return [4 /*yield*/, context.octokit.issues.createComment(context.issue({ body: newComment }))];
-                case 2:
+                case 3:
                     _a.sent();
-                    return [3 /*break*/, 5];
-                case 3: return [4 /*yield*/, context.octokit.issues.updateComment(context.repo({ body: newComment, comment_id: existingData.id }))];
-                case 4:
+                    return [3 /*break*/, 6];
+                case 4: return [4 /*yield*/, context.octokit.issues.updateComment(context.repo({ body: newComment, comment_id: existingData.id }))];
+                case 5:
                     _a.sent();
-                    _a.label = 5;
-                case 5: return [2 /*return*/];
+                    _a.label = 6;
+                case 6: return [2 /*return*/];
             }
         });
     });
