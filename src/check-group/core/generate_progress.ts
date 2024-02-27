@@ -60,7 +60,7 @@ const parseStatus = (
 async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: string }> {
   const regex = /buildId=(\d+)/;
   const match = detailURL.match(regex);
-  let buildId: string =""
+  let buildId: string = ""
 
   if (match && match.length > 1) {
     buildId = match[1];
@@ -75,8 +75,6 @@ async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: st
     const azureArtifactsData = response.data;
     const artifactCount = azureArtifactsData.count;
     const artifactValue = azureArtifactsData.value;
-
-    console.log(artifactValue);
 
     const urlDict: { [name: string]: string } = {};
 
@@ -153,6 +151,7 @@ export const generateProgressDetailsMarkdown = async (
       if (status === "success" || status === "failure") {
         const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
         const artifactLink = getArtifactName(check, artifactLinkDict);
+        console.log("check", check);
         if (artifactLink === undefined) {
           progress += `| ${link} | ${status} |  | ${mark} |\n`;
         } else {
@@ -173,6 +172,7 @@ export const generateProgressDetailsMarkdown = async (
     //   }
     // }
     progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
+    console.log("==========done");
     progress += "\n</details>\n\n";
   });
   return progress;

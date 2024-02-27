@@ -107,7 +107,6 @@ function parseDownloadUrl(detailURL) {
                     azureArtifactsData = response.data;
                     artifactCount = azureArtifactsData.count;
                     artifactValue = azureArtifactsData.value;
-                    console.log(artifactValue);
                     urlDict = {};
                     for (_i = 0, artifactValue_1 = artifactValue; _i < artifactValue_1.length; _i++) {
                         item = artifactValue_1[_i];
@@ -188,6 +187,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                     case 2:
                         artifactLinkDict = _b.sent();
                         artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
+                        console.log("check", check);
                         if (artifactLink === undefined) {
                             progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
                         }
@@ -212,6 +212,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                         //   }
                         // }
                         progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
+                        console.log("==========done");
                         progress += "\n</details>\n\n";
                         return [2 /*return*/];
                 }
