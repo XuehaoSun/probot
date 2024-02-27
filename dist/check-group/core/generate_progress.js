@@ -143,46 +143,56 @@ var generateProgressDetailsCLI = function (subprojects, postedChecks) {
     return progress;
 };
 exports.generateProgressDetailsCLI = generateProgressDetailsCLI;
-var generateProgressDetailsMarkdown = function (subprojects, postedChecks) {
-    var progress = "## Groups summary\n\n";
-    subprojects.forEach(function (subproject) {
-        // get the aggregated status of all statuses in the subproject
-        var checkResult = (0, satisfy_expected_checks_1.getChecksResult)(subproject.checks, postedChecks);
-        var subprojectEmoji = "🟡";
-        if (checkResult === "all_passing") {
-            subprojectEmoji = "🟢";
+var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { return __awaiter(void 0, void 0, void 0, function () {
+    var progress, promises;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                progress = "## Groups summary\n\n";
+                promises = [];
+                subprojects.forEach(function (subproject) {
+                    // get the aggregated status of all statuses in the subproject
+                    var checkResult = (0, satisfy_expected_checks_1.getChecksResult)(subproject.checks, postedChecks);
+                    var subprojectEmoji = "🟡";
+                    if (checkResult === "all_passing") {
+                        subprojectEmoji = "🟢";
+                    }
+                    else if (checkResult === "has_failure") {
+                        subprojectEmoji = "🔴";
+                    }
+                    // generate the markdown table
+                    progress += "<details>\n\n";
+                    progress += "<summary><b>".concat(subprojectEmoji, " ").concat(subproject.id, "</b></summary>\n\n");
+                    progress += "| Check ID | Status | link |     |\n";
+                    progress += "| -------- | ------ | ---- | --- |\n";
+                    subproject.checks.forEach(function (check) {
+                        var link = statusToLink(check, postedChecks);
+                        var status = parseStatus(check, postedChecks);
+                        var mark = statusToMark(check, postedChecks);
+                        // let artifactLink = parseDownloadUrl(postedChecks[check].details_url)
+                        // artifactLink = artifactLink[`${getArtifactName(check)}`]
+                        var artifactLink = "www.google.com";
+                        progress += "| ".concat(link, " | ").concat(status, " | [artifact](").concat(artifactLink, ") | ").concat(mark, " |\n");
+                    });
+                    var url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
+                    promises.push((0, parse_artifact_1.fetchTableData)(url)
+                        .then(function (tableData) {
+                        progress += "| ".concat(tableData, " |");
+                        progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
+                        progress += "\n</details>\n\n";
+                        console.log('Table Data:', tableData);
+                    })
+                        .catch(function (error) {
+                        console.error('Error:', error);
+                    }));
+                });
+                return [4 /*yield*/, Promise.all(promises)];
+            case 1:
+                _a.sent();
+                return [2 /*return*/, progress];
         }
-        else if (checkResult === "has_failure") {
-            subprojectEmoji = "🔴";
-        }
-        // generate the markdown table
-        progress += "<details>\n\n";
-        progress += "<summary><b>".concat(subprojectEmoji, " ").concat(subproject.id, "</b></summary>\n\n");
-        progress += "| Check ID | Status | link |     |\n";
-        progress += "| -------- | ------ | ---- | --- |\n";
-        subproject.checks.forEach(function (check) {
-            var link = statusToLink(check, postedChecks);
-            var status = parseStatus(check, postedChecks);
-            var mark = statusToMark(check, postedChecks);
-            // let artifactLink = parseDownloadUrl(postedChecks[check].details_url)
-            // artifactLink = artifactLink[`${getArtifactName(check)}`]
-            var artifactLink = "www.google.com";
-            progress += "| ".concat(link, " | ").concat(status, " | [artifact](").concat(artifactLink, ") | ").concat(mark, " |\n");
-        });
-        var url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
-        (0, parse_artifact_1.fetchTableData)(url)
-            .then(function (tableData) {
-            progress += "| ".concat(tableData, " |");
-            progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
-            progress += "\n</details>\n\n";
-            console.log('Table Data:', tableData);
-        })
-            .catch(function (error) {
-            console.error('Error:', error);
-        });
     });
-    return progress;
-};
+}); };
 exports.generateProgressDetailsMarkdown = generateProgressDetailsMarkdown;
 var PR_COMMENT_START = "<!-- checkgroup-comment-start -->";
 function formPrComment(result, inputs, subprojects, postedChecks) {
