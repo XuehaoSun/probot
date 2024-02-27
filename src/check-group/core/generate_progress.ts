@@ -145,13 +145,13 @@ export const generateProgressDetailsMarkdown = (
     fetchTableData(url)
       .then(tableData => {
         progress += `| ${tableData} |`
+        progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
+        progress += "\n</details>\n\n";
         console.log('Table Data:', tableData);
       })
       .catch(error => {
         console.error('Error:', error);
       });
-    progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
-    progress += "\n</details>\n\n";
   });
   return progress;
 };
