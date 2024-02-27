@@ -57,8 +57,8 @@ const parseStatus = (
   return "no_status"
 }
 
-async function parseDownloadUrl(buildId: string): Promise<{ [name: string]: string }> {
-  const azureArtifactApiUrl = `https://dev.azure.com/lpot-inc/neural-compressor/_apis/build/builds/${buildId}/artifacts?api-version=5.1`;
+async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: string }> {
+  const azureArtifactApiUrl = `${detailURL}/artifacts?api-version=5.1`;
 
   try {
     const response = await axios.get(azureArtifactApiUrl);
