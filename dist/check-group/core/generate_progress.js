@@ -43,6 +43,7 @@ exports.commentOnPr = exports.generateProgressDetailsMarkdown = exports.generate
 var satisfy_expected_checks_1 = require("./satisfy_expected_checks");
 var axios_1 = __importDefault(require("axios"));
 var config_getter_1 = require("./config_getter");
+var parse_artifact_1 = require("./parse_artifact");
 var statusToMark = function (check, postedChecks) {
     if (check in postedChecks) {
         if (postedChecks[check].conclusion === "success") {
@@ -153,15 +154,15 @@ var generateProgressDetailsCLI = function (subprojects, postedChecks) {
 };
 exports.generateProgressDetailsCLI = generateProgressDetailsCLI;
 var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { return __awaiter(void 0, void 0, void 0, function () {
-    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink, check, status_3, artifactLinkDict, artifactLink, tableData, _c, tableData_1, data, error_2;
+    return __generator(this, function (_d) {
+        switch (_d.label) {
             case 0:
                 progress = "## Groups summary\n\n";
                 _i = 0, subprojects_1 = subprojects;
-                _c.label = 1;
+                _d.label = 1;
             case 1:
-                if (!(_i < subprojects_1.length)) return [3 /*break*/, 8];
+                if (!(_i < subprojects_1.length)) return [3 /*break*/, 13];
                 subproject = subprojects_1[_i];
                 checkResult = (0, satisfy_expected_checks_1.getChecksResult)(subproject.checks, postedChecks);
                 subprojectEmoji = "🟡";
@@ -177,7 +178,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 progress += "| Check ID | Status | link |     |\n";
                 progress += "| -------- | ------ | ---- | --- |\n";
                 _a = 0, _b = subproject.checks;
-                _c.label = 2;
+                _d.label = 2;
             case 2:
                 if (!(_a < _b.length)) return [3 /*break*/, 6];
                 check = _b[_a];
@@ -187,7 +188,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 if (!(status_2 === "success" || status_2 === "failure")) return [3 /*break*/, 4];
                 return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
             case 3:
-                artifactLinkDict = _c.sent();
+                artifactLinkDict = _d.sent();
                 artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
                 if (artifactLink === undefined) {
                     progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
@@ -198,27 +199,46 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 return [3 /*break*/, 5];
             case 4:
                 progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
-                _c.label = 5;
+                _d.label = 5;
             case 5:
                 _a++;
                 return [3 /*break*/, 2];
             case 6:
-                // if (subproject.id == "Unit Tests basic workflow") {
-                //   const url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
-                //   try {
-                //     const tableData = await fetchTableData(url);
-                //     progress += `| ${tableData} |`
-                //   } catch (error) {
-                //     console.error('Error:', error);
-                //   }
-                // }
+                if (!(subproject.id == "Unit Tests basic workflow")) return [3 /*break*/, 11];
+                check = "UT-Basic (Coverage Combine CollectDatafiles)";
+                status_3 = parseStatus(check, postedChecks);
+                if (!(status_3 === "success" || status_3 === "failure")) return [3 /*break*/, 11];
+                return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
+            case 7:
+                artifactLinkDict = _d.sent();
+                artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
+                if (!(artifactLink !== undefined)) return [3 /*break*/, 11];
+                _d.label = 8;
+            case 8:
+                _d.trys.push([8, 10, , 11]);
+                return [4 /*yield*/, (0, parse_artifact_1.fetchTableData)(artifactLink)];
+            case 9:
+                tableData = _d.sent();
+                progress += "\n\n<details>\n\n";
+                progress += "<summary><b>UT-Basic coverage report</b></summary>\n\n";
+                for (_c = 0, tableData_1 = tableData; _c < tableData_1.length; _c++) {
+                    data = tableData_1[_c];
+                    progress += "".concat(data);
+                }
+                progress += "\n\n</details>\n\n";
+                return [3 /*break*/, 11];
+            case 10:
+                error_2 = _d.sent();
+                console.error('Error:', error_2);
+                return [3 /*break*/, 11];
+            case 11:
                 progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
                 progress += "\n</details>\n\n";
-                _c.label = 7;
-            case 7:
+                _d.label = 12;
+            case 12:
                 _i++;
                 return [3 /*break*/, 1];
-            case 8:
+            case 13:
                 ;
                 return [2 /*return*/, progress];
         }

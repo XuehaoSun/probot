@@ -62,7 +62,10 @@ function fetchTableData(url) {
                             $_1(row).find('td').each(function (j, cell) {
                                 rowData.push($_1(cell).text().trim());
                             });
-                            rows.push(rowData.join(' | '));
+                            $_1(row).find('th').each(function (j, cell) {
+                                rowData.push($_1(cell).text().trim());
+                            });
+                            rows.push("|".concat(rowData.join('|'), "|"));
                         });
                         tableData_1.push(rows);
                     });

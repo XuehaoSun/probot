@@ -16,7 +16,10 @@ export async function fetchTableData(url: string): Promise<string[][]> {
         $(row).find('td').each((j, cell) => {
           rowData.push($(cell).text().trim());
         });
-        rows.push(rowData.join(' | '));
+        $(row).find('th').each((j, cell) => {
+          rowData.push($(cell).text().trim());
+        });
+        rows.push(`|${rowData.join('|')}|`);
       });
       tableData.push(rows);
     });
