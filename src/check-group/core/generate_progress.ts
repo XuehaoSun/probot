@@ -129,7 +129,7 @@ export const generateProgressDetailsMarkdown = async (
   postedChecks: Record<string, CheckRunData>,
 ): Promise<string> => {
   let progress = "## Groups summary\n\n";
-  subprojects.forEach(async (subproject) => {
+  for (const subproject of subprojects){
     // get the aggregated status of all statuses in the subproject
     const checkResult = getChecksResult(subproject.checks, postedChecks)
     let subprojectEmoji = "🟡";
@@ -151,7 +151,6 @@ export const generateProgressDetailsMarkdown = async (
       if (status === "success" || status === "failure") {
         const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
         const artifactLink = getArtifactName(check, artifactLinkDict);
-        console.log("check", check);
         if (artifactLink === undefined) {
           progress += `| ${link} | ${status} |  | ${mark} |\n`;
         } else {
@@ -172,9 +171,8 @@ export const generateProgressDetailsMarkdown = async (
     //   }
     // }
     progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
-    console.log("==========done");
     progress += "\n</details>\n\n";
-  });
+  };
   return progress;
 };
 

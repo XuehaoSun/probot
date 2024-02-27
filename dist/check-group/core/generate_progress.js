@@ -153,72 +153,75 @@ var generateProgressDetailsCLI = function (subprojects, postedChecks) {
 };
 exports.generateProgressDetailsCLI = generateProgressDetailsCLI;
 var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { return __awaiter(void 0, void 0, void 0, function () {
-    var progress;
-    return __generator(this, function (_a) {
-        progress = "## Groups summary\n\n";
-        subprojects.forEach(function (subproject) { return __awaiter(void 0, void 0, void 0, function () {
-            var checkResult, subprojectEmoji, _i, _a, check, link, status_2, mark, artifactLinkDict, artifactLink;
-            return __generator(this, function (_b) {
-                switch (_b.label) {
-                    case 0:
-                        checkResult = (0, satisfy_expected_checks_1.getChecksResult)(subproject.checks, postedChecks);
-                        subprojectEmoji = "🟡";
-                        if (checkResult === "all_passing") {
-                            subprojectEmoji = "🟢";
-                        }
-                        else if (checkResult === "has_failure") {
-                            subprojectEmoji = "🔴";
-                        }
-                        // generate the markdown table
-                        progress += "<details>\n\n";
-                        progress += "<summary><b>".concat(subprojectEmoji, " ").concat(subproject.id, "</b></summary>\n\n");
-                        progress += "| Check ID | Status | link |     |\n";
-                        progress += "| -------- | ------ | ---- | --- |\n";
-                        _i = 0, _a = subproject.checks;
-                        _b.label = 1;
-                    case 1:
-                        if (!(_i < _a.length)) return [3 /*break*/, 5];
-                        check = _a[_i];
-                        link = statusToLink(check, postedChecks);
-                        status_2 = parseStatus(check, postedChecks);
-                        mark = statusToMark(check, postedChecks);
-                        if (!(status_2 === "success" || status_2 === "failure")) return [3 /*break*/, 3];
-                        return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
-                    case 2:
-                        artifactLinkDict = _b.sent();
-                        artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
-                        console.log("check", check);
-                        if (artifactLink === undefined) {
-                            progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
-                        }
-                        else {
-                            progress += "| ".concat(link, " | ").concat(status_2, " | [artifact](").concat(artifactLink, ") | ").concat(mark, " |\n");
-                        }
-                        return [3 /*break*/, 4];
-                    case 3:
-                        progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
-                        _b.label = 4;
-                    case 4:
-                        _i++;
-                        return [3 /*break*/, 1];
-                    case 5:
-                        // if (subproject.id == "Unit Tests basic workflow") {
-                        //   const url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
-                        //   try {
-                        //     const tableData = await fetchTableData(url);
-                        //     progress += `| ${tableData} |`
-                        //   } catch (error) {
-                        //     console.error('Error:', error);
-                        //   }
-                        // }
-                        progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
-                        console.log("==========done");
-                        progress += "\n</details>\n\n";
-                        return [2 /*return*/];
+    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                progress = "## Groups summary\n\n";
+                _i = 0, subprojects_1 = subprojects;
+                _c.label = 1;
+            case 1:
+                if (!(_i < subprojects_1.length)) return [3 /*break*/, 8];
+                subproject = subprojects_1[_i];
+                checkResult = (0, satisfy_expected_checks_1.getChecksResult)(subproject.checks, postedChecks);
+                subprojectEmoji = "🟡";
+                if (checkResult === "all_passing") {
+                    subprojectEmoji = "🟢";
                 }
-            });
-        }); });
-        return [2 /*return*/, progress];
+                else if (checkResult === "has_failure") {
+                    subprojectEmoji = "🔴";
+                }
+                // generate the markdown table
+                progress += "<details>\n\n";
+                progress += "<summary><b>".concat(subprojectEmoji, " ").concat(subproject.id, "</b></summary>\n\n");
+                progress += "| Check ID | Status | link |     |\n";
+                progress += "| -------- | ------ | ---- | --- |\n";
+                _a = 0, _b = subproject.checks;
+                _c.label = 2;
+            case 2:
+                if (!(_a < _b.length)) return [3 /*break*/, 6];
+                check = _b[_a];
+                link = statusToLink(check, postedChecks);
+                status_2 = parseStatus(check, postedChecks);
+                mark = statusToMark(check, postedChecks);
+                if (!(status_2 === "success" || status_2 === "failure")) return [3 /*break*/, 4];
+                return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
+            case 3:
+                artifactLinkDict = _c.sent();
+                artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
+                if (artifactLink === undefined) {
+                    progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
+                }
+                else {
+                    progress += "| ".concat(link, " | ").concat(status_2, " | [artifact](").concat(artifactLink, ") | ").concat(mark, " |\n");
+                }
+                return [3 /*break*/, 5];
+            case 4:
+                progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
+                _c.label = 5;
+            case 5:
+                _a++;
+                return [3 /*break*/, 2];
+            case 6:
+                // if (subproject.id == "Unit Tests basic workflow") {
+                //   const url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
+                //   try {
+                //     const tableData = await fetchTableData(url);
+                //     progress += `| ${tableData} |`
+                //   } catch (error) {
+                //     console.error('Error:', error);
+                //   }
+                // }
+                progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
+                progress += "\n</details>\n\n";
+                _c.label = 7;
+            case 7:
+                _i++;
+                return [3 /*break*/, 1];
+            case 8:
+                ;
+                return [2 /*return*/, progress];
+        }
     });
 }); };
 exports.generateProgressDetailsMarkdown = generateProgressDetailsMarkdown;
