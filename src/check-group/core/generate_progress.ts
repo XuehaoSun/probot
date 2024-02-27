@@ -137,8 +137,9 @@ export const generateProgressDetailsMarkdown = (
       const link = statusToLink(check, postedChecks);
       const status = parseStatus(check, postedChecks);
       const mark = statusToMark(check, postedChecks);
-      let artifactLink = parseDownloadUrl(postedChecks[check].details_url)
-      artifactLink = artifactLink[`${getArtifactName(check)}`]
+      // let artifactLink = parseDownloadUrl(postedChecks[check].details_url)
+      // artifactLink = artifactLink[`${getArtifactName(check)}`]
+      let artifactLink = "www.google.com"
       progress += `| ${link} | ${status} | [artifact](${artifactLink}) | ${mark} |\n`;
     })
     const url = 'https://artprodcus3.artifacts.visualstudio.com/Acd5c2212-3bfc-4706-9afe-b292ced6ae69/b7121868-d73a-4794-90c1-23135f974d09/_apis/artifact/cGlwZWxpbmVhcnRpZmFjdDovL2xwb3QtaW5jL3Byb2plY3RJZC9iNzEyMTg2OC1kNzNhLTQ3OTQtOTBjMS0yMzEzNWY5NzRkMDkvYnVpbGRJZC8yNjk3NC9hcnRpZmFjdE5hbWUvVVRfY292ZXJhZ2VfcmVwb3J00/content?format=file&subPath=%2Fcoverage_compare.html';
