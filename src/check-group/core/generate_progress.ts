@@ -76,10 +76,14 @@ async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: st
     const artifactCount = azureArtifactsData.count;
     const artifactValue = azureArtifactsData.value;
 
+    if(artifactCount === 0) {
+      return {}
+    }
+
     const urlDict: { [name: string]: string } = {};
 
     for (const item of artifactValue) {
-      const artifactDownloadUrl = `${item.resource.downloadUrl.slice(0, -3)}file&subPath=%2F`;
+      const artifactDownloadUrl = `${item.resource.downloadUrl.slice(0, -3)}`;
       urlDict[item.name] = artifactDownloadUrl;
     }
 
@@ -148,9 +152,9 @@ export const generateProgressDetailsMarkdown = async (
       const link = statusToLink(check, postedChecks);
       const status = parseStatus(check, postedChecks);
       const mark = statusToMark(check, postedChecks);
-      if (status === "success" || status === "failure") {
+      if (status === "failure") {
         const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
-        const artifactLink = getArtifactName(check, artifactLinkDict);
+        const artifactLink = await getArtifactName(check, artifactLinkDict);
         if (artifactLink === undefined) {
           progress += `| ${link} | ${status} |  | ${mark} |\n`;
         } else {
@@ -166,7 +170,7 @@ export const generateProgressDetailsMarkdown = async (
       const status = parseStatus(check, postedChecks)
       if (status === "success" || status === "failure") {
         const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
-        const artifactLink = getArtifactName(check, artifactLinkDict);
+        const artifactLink = await getArtifactName(check, artifactLinkDict);
         if (artifactLink !== undefined) {
           try {
           const fetchTableData = createFetcher('html');
@@ -184,28 +188,28 @@ export const generateProgressDetailsMarkdown = async (
       }
     }
 
-    if (subproject.id == "Model Tests workflow") {
-      const check = "Model-Test (Generate Report GenerateReport)"
-      const status = parseStatus(check, postedChecks)
-      if (status === "success" || status === "failure") {
-        const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
-        const artifactLink = getArtifactName(check, artifactLinkDict);
-        if (artifactLink !== undefined) {
-          try {
-            const fetchTableData = createFetcher('html');
-            const tableData = await fetchTableData.fetch(artifactLink);
-            progress += `\n\n<details>\n\n`
-            progress += `<summary><b>Model test report</b></summary>\n\n`;
-            for (const data of tableData) {
-              progress += `${data}`
-            }
-            progress += "\n\n</details>\n\n";
-          } catch (error) {
-            console.error('Error:', error);
-          }
-        }
-      }
-    }
+    // if (subproject.id == "Model Tests workflow") {
+    //   const check = "Model-Test (Generate Report GenerateReport)"
+    //   const status = parseStatus(check, postedChecks)
+    //   if (status === "success" || status === "failure") {
+    //     const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
+    //     const artifactLink = getArtifactName(check, artifactLinkDict);
+    //     if (artifactLink !== undefined) {
+    //       try {
+    //         const fetchTableData = createFetcher('html');
+    //         const tableData = await fetchTableData.fetch(artifactLink);
+    //         progress += `\n\n<details>\n\n`
+    //         progress += `<summary><b>Model test report</b></summary>\n\n`;
+    //         for (const data of tableData) {
+    //           progress += `${data}`
+    //         }
+    //         progress += "\n\n</details>\n\n";
+    //       } catch (error) {
+    //         console.error('Error:', error);
+    //       }
+    //     }
+    //   }
+    // }
     progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
     progress += "\n</details>\n\n";
   };

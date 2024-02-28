@@ -69,11 +69,15 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getArtifactName = exports.fetchConfig = void 0;
 var user_config_parser_1 = require("./user_config_parser");
 var constant_1 = require("./constant");
 var core = __importStar(require("@actions/core"));
+var axios_1 = __importDefault(require("axios"));
 /**
  * Fetches the app configuration from the user's repository.
  *
@@ -111,15 +115,51 @@ var fetchConfig = function (context) { return __awaiter(void 0, void 0, void 0, 
     });
 }); };
 exports.fetchConfig = fetchConfig;
-var getArtifactName = function (check, urlDict) {
-    if (constant_1.artifactDict["".concat(check)] !== undefined) {
-        var _a = [constant_1.artifactDict["".concat(check)].id, constant_1.artifactDict["".concat(check)].name], id = _a[0], name_1 = _a[1];
-        return "".concat(urlDict[id]).concat(name_1);
-    }
-    else {
-        return undefined;
-    }
-};
+function checkURL(url) {
+    return __awaiter(this, void 0, void 0, function () {
+        var statusCode;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, axios_1.default.get(url)
+                        .then(function (response) {
+                        return response.status;
+                    })
+                        .catch(function (reason) {
+                        return reason.response.status;
+                    })];
+                case 1:
+                    statusCode = _a.sent();
+                    return [2 /*return*/, statusCode];
+            }
+        });
+    });
+}
+var getArtifactName = function (check, urlDict) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, id, name_1, link, statusCode;
+    return __generator(this, function (_b) {
+        switch (_b.label) {
+            case 0:
+                if (!(constant_1.artifactDict["".concat(check)] !== undefined)) return [3 /*break*/, 2];
+                _a = [constant_1.artifactDict["".concat(check)].id, constant_1.artifactDict["".concat(check)].name], id = _a[0], name_1 = _a[1];
+                if (name_1 != "zip") {
+                    name_1 = "file&subPath=%2F".concat(name_1);
+                }
+                link = "".concat(urlDict[id]).concat(name_1);
+                return [4 /*yield*/, checkURL(link)];
+            case 1:
+                statusCode = _b.sent();
+                if (statusCode !== 200) {
+                    return [2 /*return*/, undefined];
+                }
+                else {
+                    return [2 /*return*/, link];
+                }
+                return [3 /*break*/, 3];
+            case 2: return [2 /*return*/, undefined];
+            case 3: return [2 /*return*/];
+        }
+    });
+}); };
 exports.getArtifactName = getArtifactName;
 var readConfig = function (context, branch) { return __awaiter(void 0, void 0, void 0, function () {
     var params, config;

@@ -4,6 +4,8 @@ import { parseUserConfig } from "./user_config_parser";
 import { PullRequestEvent } from '@octokit/webhooks-types';
 import { artifactDict } from './constant';
 import * as core from '@actions/core'
+import axios from "axios";
+import { AxiosResponse, AxiosError } from 'axios'
 
 /**
  * Fetches the app configuration from the user's repository.
@@ -30,10 +32,41 @@ export const fetchConfig = async (context: Context): Promise<CheckGroupConfig> =
   return parseUserConfig(configData);
 };
 
-export const getArtifactName = (check: string, urlDict: { [name: string]: string }): string | undefined => {
+async function checkURL(url: string): Promise<number> {
+  const statusCode: number =
+    await axios.get(url)
+      .then((response: AxiosResponse<{ user: { name: string } }>) => {
+        return response.status;
+      })
+      .catch((reason: AxiosError<{ additionalInfo: string }>) => {
+        return reason.response!.status;
+      });
+  return statusCode
+}
+
+export const getArtifactName = async (check: string, urlDict: { [name: string]: string }): Promise<string | undefined> => {
   if (artifactDict[`${check}`] !== undefined) {
-    let [id, name] = [artifactDict[`${check}`].id, artifactDict[`${check}`].name]
-    return `${urlDict[id]}${name}`
+    let [id, name] = [artifactDict[`${check}`].id, artifactDict[`${check}`].name];
+    if (name != "zip") {
+      name = `file&subPath=%2F${name}`
+    }
+    const link = `${urlDict[id]}${name}`;
+    let statusCode = await checkURL(link);
+    if (statusCode !== 200) {
+      return undefined;
+    } else {
+      return link
+    }
+    // for (let i = 1; i <= 10; i++) {
+    //   const link = `${urlDict[id]}${i}_${name}`;
+    //   let statusCode = await checkURL(link);
+    //   if (statusCode !== 200) {
+    //     return undefined;
+    //   } else {
+    //     return link
+    //   }
+    // }
+    // return undefined
   } else {
     return undefined
   }
