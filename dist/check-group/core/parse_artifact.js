@@ -39,44 +39,86 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fetchTableData = void 0;
+exports.createFetcher = void 0;
 var axios_1 = __importDefault(require("axios"));
 var cheerio_1 = __importDefault(require("cheerio"));
-function fetchTableData(url) {
-    return __awaiter(this, void 0, void 0, function () {
-        var response, html, $_1, tableData_1, error_1;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 2, , 3]);
-                    return [4 /*yield*/, axios_1.default.get(url)];
-                case 1:
-                    response = _a.sent();
-                    html = response.data;
-                    $_1 = cheerio_1.default.load(html);
-                    tableData_1 = [];
-                    $_1('table').each(function (index, element) {
-                        var rows = [];
-                        $_1(element).find('tr').each(function (i, row) {
-                            var rowData = [];
-                            $_1(row).find('td').each(function (j, cell) {
-                                rowData.push($_1(cell).text().trim());
-                            });
-                            $_1(row).find('th').each(function (j, cell) {
-                                rowData.push($_1(cell).text().trim());
-                            });
-                            rows.push("|".concat(rowData.join('|'), "|"));
+var tableMark = " --- ";
+var HTMLTableFetcher = /** @class */ (function () {
+    function HTMLTableFetcher() {
+    }
+    HTMLTableFetcher.prototype.fetch = function (url) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, html, $, tables_1, error_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, axios_1.default.get(url)];
+                    case 1:
+                        response = _a.sent();
+                        html = response.data;
+                        $ = cheerio_1.default.load(html);
+                        tables_1 = [];
+                        $('table').each(function (index, element) {
+                            tables_1.push('<table>$(element).html()</table>' || '');
                         });
-                        tableData_1.push(rows);
-                    });
-                    return [2 /*return*/, tableData_1];
-                case 2:
-                    error_1 = _a.sent();
-                    console.error('Error fetching table data:', error_1);
-                    return [2 /*return*/, []];
-                case 3: return [2 /*return*/];
-            }
+                        return [2 /*return*/, tables_1];
+                    case 2:
+                        error_1 = _a.sent();
+                        console.error('Error fetching table data:', error_1);
+                        return [2 /*return*/, []];
+                    case 3: return [2 /*return*/];
+                }
+            });
         });
-    });
+    };
+    return HTMLTableFetcher;
+}());
+var LogSummaryFetcher = /** @class */ (function () {
+    function LogSummaryFetcher() {
+    }
+    LogSummaryFetcher.prototype.fetch = function (url) {
+        return __awaiter(this, void 0, void 0, function () {
+            var response, text, lines, headers, table, rows, tableData, _i, rows_1, row, rowData, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, axios_1.default.get(url)];
+                    case 1:
+                        response = _a.sent();
+                        text = response.data;
+                        lines = text.split('\n');
+                        headers = lines[0].split(';');
+                        table = Array(headers.length).fill(tableMark);
+                        rows = lines.slice(1);
+                        tableData = ["|".concat(headers.join('|'), "|"), "|".concat(table.join('|'), "|")];
+                        for (_i = 0, rows_1 = rows; _i < rows_1.length; _i++) {
+                            row = rows_1[_i];
+                            rowData = row.split(';').join('|');
+                            tableData.push(rowData);
+                        }
+                        return [2 /*return*/, tableData];
+                    case 2:
+                        error_2 = _a.sent();
+                        console.error('Error fetching summary log:', error_2);
+                        return [2 /*return*/, []];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return LogSummaryFetcher;
+}());
+function createFetcher(type) {
+    if (type === 'html') {
+        return new HTMLTableFetcher();
+    }
+    else if (type === 'log') {
+        return new LogSummaryFetcher();
+    }
+    else {
+        throw new Error('Invalid fetcher type');
+    }
 }
-exports.fetchTableData = fetchTableData;
+exports.createFetcher = createFetcher;

@@ -154,15 +154,15 @@ var generateProgressDetailsCLI = function (subprojects, postedChecks) {
 };
 exports.generateProgressDetailsCLI = generateProgressDetailsCLI;
 var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { return __awaiter(void 0, void 0, void 0, function () {
-    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink, check, status_3, artifactLinkDict, artifactLink, tableData, _c, tableData_1, data, error_2;
-    return __generator(this, function (_d) {
-        switch (_d.label) {
+    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink, check, status_3, artifactLinkDict, artifactLink, fetchTableData, tableData, _c, tableData_1, data, error_2, check, status_4, artifactLinkDict, artifactLink, fetchTableData, tableData, _d, tableData_2, data, error_3;
+    return __generator(this, function (_e) {
+        switch (_e.label) {
             case 0:
                 progress = "## Groups summary\n\n";
                 _i = 0, subprojects_1 = subprojects;
-                _d.label = 1;
+                _e.label = 1;
             case 1:
-                if (!(_i < subprojects_1.length)) return [3 /*break*/, 13];
+                if (!(_i < subprojects_1.length)) return [3 /*break*/, 18];
                 subproject = subprojects_1[_i];
                 checkResult = (0, satisfy_expected_checks_1.getChecksResult)(subproject.checks, postedChecks);
                 subprojectEmoji = "🟡";
@@ -178,7 +178,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 progress += "| Check ID | Status | link |     |\n";
                 progress += "| -------- | ------ | ---- | --- |\n";
                 _a = 0, _b = subproject.checks;
-                _d.label = 2;
+                _e.label = 2;
             case 2:
                 if (!(_a < _b.length)) return [3 /*break*/, 6];
                 check = _b[_a];
@@ -188,7 +188,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 if (!(status_2 === "success" || status_2 === "failure")) return [3 /*break*/, 4];
                 return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
             case 3:
-                artifactLinkDict = _d.sent();
+                artifactLinkDict = _e.sent();
                 artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
                 if (artifactLink === undefined) {
                     progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
@@ -199,7 +199,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 return [3 /*break*/, 5];
             case 4:
                 progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
-                _d.label = 5;
+                _e.label = 5;
             case 5:
                 _a++;
                 return [3 /*break*/, 2];
@@ -210,15 +210,16 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 if (!(status_3 === "success" || status_3 === "failure")) return [3 /*break*/, 11];
                 return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
             case 7:
-                artifactLinkDict = _d.sent();
+                artifactLinkDict = _e.sent();
                 artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
                 if (!(artifactLink !== undefined)) return [3 /*break*/, 11];
-                _d.label = 8;
+                _e.label = 8;
             case 8:
-                _d.trys.push([8, 10, , 11]);
-                return [4 /*yield*/, (0, parse_artifact_1.fetchTableData)(artifactLink)];
+                _e.trys.push([8, 10, , 11]);
+                fetchTableData = (0, parse_artifact_1.createFetcher)('html');
+                return [4 /*yield*/, fetchTableData.fetch(artifactLink)];
             case 9:
-                tableData = _d.sent();
+                tableData = _e.sent();
                 progress += "\n\n<details>\n\n";
                 progress += "<summary><b>UT-Basic coverage report</b></summary>\n\n";
                 for (_c = 0, tableData_1 = tableData; _c < tableData_1.length; _c++) {
@@ -228,17 +229,46 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 progress += "\n\n</details>\n\n";
                 return [3 /*break*/, 11];
             case 10:
-                error_2 = _d.sent();
+                error_2 = _e.sent();
                 console.error('Error:', error_2);
                 return [3 /*break*/, 11];
             case 11:
+                if (!(subproject.id == "Model Tests workflow")) return [3 /*break*/, 16];
+                check = "Model-Test (Generate Report GenerateReport)";
+                status_4 = parseStatus(check, postedChecks);
+                if (!(status_4 === "success" || status_4 === "failure")) return [3 /*break*/, 16];
+                return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
+            case 12:
+                artifactLinkDict = _e.sent();
+                artifactLink = (0, config_getter_1.getArtifactName)(check, artifactLinkDict);
+                if (!(artifactLink !== undefined)) return [3 /*break*/, 16];
+                _e.label = 13;
+            case 13:
+                _e.trys.push([13, 15, , 16]);
+                fetchTableData = (0, parse_artifact_1.createFetcher)('log');
+                return [4 /*yield*/, fetchTableData.fetch(artifactLink)];
+            case 14:
+                tableData = _e.sent();
+                progress += "\n\n<details>\n\n";
+                progress += "<summary><b>Model test report</b></summary>\n\n";
+                for (_d = 0, tableData_2 = tableData; _d < tableData_2.length; _d++) {
+                    data = tableData_2[_d];
+                    progress += "".concat(data);
+                }
+                progress += "\n\n</details>\n\n";
+                return [3 /*break*/, 16];
+            case 15:
+                error_3 = _e.sent();
+                console.error('Error:', error_3);
+                return [3 /*break*/, 16];
+            case 16:
                 progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
                 progress += "\n</details>\n\n";
-                _d.label = 12;
-            case 12:
+                _e.label = 17;
+            case 17:
                 _i++;
                 return [3 /*break*/, 1];
-            case 13:
+            case 18:
                 ;
                 return [2 /*return*/, progress];
         }
