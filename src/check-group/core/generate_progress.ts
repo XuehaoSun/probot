@@ -4,7 +4,7 @@ import { getChecksResult } from "./satisfy_expected_checks";
 
 import axios from 'axios';
 import { getArtifactName } from "./config_getter";
-import { fetchTableData } from "./parse_artifact";
+import { createFetcher } from "./parse_artifact";
 
 
 const statusToMark = (
@@ -169,9 +169,33 @@ export const generateProgressDetailsMarkdown = async (
         const artifactLink = getArtifactName(check, artifactLinkDict);
         if (artifactLink !== undefined) {
           try {
-            const tableData = await fetchTableData(artifactLink);
+          const fetchTableData = createFetcher('html');
+          const tableData = await fetchTableData.fetch(artifactLink);
             progress += `\n\n<details>\n\n`
             progress += `<summary><b>UT-Basic coverage report</b></summary>\n\n`;
+            for (const data of tableData) {
+              progress += `${data}`
+            }
+            progress += "\n\n</details>\n\n";
+          } catch (error) {
+            console.error('Error:', error);
+          }
+        }
+      }
+    }
+
+    if (subproject.id == "Model Tests workflow") {
+      const check = "Model-Test (Generate Report GenerateReport)"
+      const status = parseStatus(check, postedChecks)
+      if (status === "success" || status === "failure") {
+        const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
+        const artifactLink = getArtifactName(check, artifactLinkDict);
+        if (artifactLink !== undefined) {
+          try {
+            const fetchTableData = createFetcher('log');
+            const tableData = await fetchTableData.fetch(artifactLink);
+            progress += `\n\n<details>\n\n`
+            progress += `<summary><b>Model test report</b></summary>\n\n`;
             for (const data of tableData) {
               progress += `${data}`
             }
