@@ -17,7 +17,7 @@ class HTMLTableFetcher implements TableFetcher {
 
       const tables: string[] = [];
       $('table').each((index, element) => {
-          tables.push('<table>$(element).html()</table>' || '');
+          tables.push(`<table>${$(element).html()}</table>` || '');
       });
 
       return tables;

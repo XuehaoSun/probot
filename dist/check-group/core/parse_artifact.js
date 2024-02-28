@@ -48,7 +48,7 @@ var HTMLTableFetcher = /** @class */ (function () {
     }
     HTMLTableFetcher.prototype.fetch = function (url) {
         return __awaiter(this, void 0, void 0, function () {
-            var response, html, $, tables_1, error_1;
+            var response, html, $_1, tables_1, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -57,10 +57,10 @@ var HTMLTableFetcher = /** @class */ (function () {
                     case 1:
                         response = _a.sent();
                         html = response.data;
-                        $ = cheerio_1.default.load(html);
+                        $_1 = cheerio_1.default.load(html);
                         tables_1 = [];
-                        $('table').each(function (index, element) {
-                            tables_1.push('<table>$(element).html()</table>' || '');
+                        $_1('table').each(function (index, element) {
+                            tables_1.push("<table>".concat($_1(element).html(), "</table>") || '');
                         });
                         return [2 /*return*/, tables_1];
                     case 2:
