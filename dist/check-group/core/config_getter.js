@@ -125,7 +125,8 @@ function checkURL(url) {
                         return response.status;
                     })
                         .catch(function (reason) {
-                        return reason.response.status;
+                        var _a;
+                        return (_a = reason.response) === null || _a === void 0 ? void 0 : _a.status;
                     })];
                 case 1:
                     statusCode = _a.sent();

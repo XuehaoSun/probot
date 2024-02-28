@@ -39,7 +39,7 @@ async function checkURL(url: string): Promise<number> {
         return response.status;
       })
       .catch((reason: AxiosError<{ additionalInfo: string }>) => {
-        return reason.response!.status;
+        return reason.response?.status;
       });
   return statusCode
 }
