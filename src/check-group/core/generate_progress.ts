@@ -192,7 +192,7 @@ export const generateProgressDetailsMarkdown = async (
         const artifactLink = getArtifactName(check, artifactLinkDict);
         if (artifactLink !== undefined) {
           try {
-            const fetchTableData = createFetcher('log');
+            const fetchTableData = createFetcher('html');
             const tableData = await fetchTableData.fetch(artifactLink);
             progress += `\n\n<details>\n\n`
             progress += `<summary><b>Model test report</b></summary>\n\n`;

@@ -245,7 +245,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 _e.label = 13;
             case 13:
                 _e.trys.push([13, 15, , 16]);
-                fetchTableData = (0, parse_artifact_1.createFetcher)('log');
+                fetchTableData = (0, parse_artifact_1.createFetcher)('html');
                 return [4 /*yield*/, fetchTableData.fetch(artifactLink)];
             case 14:
                 tableData = _e.sent();
