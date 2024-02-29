@@ -28,6 +28,7 @@ exports.getChecksResult = getChecksResult;
 var getSubProjResult = function (subProjs, postedChecks) {
     var result = "all_passing";
     var hasFailure = false;
+    var finished = true;
     for (var _i = 0, subProjs_1 = subProjs; _i < subProjs_1.length; _i++) {
         var subProj = subProjs_1[_i];
         for (var _a = 0, _b = subProj.checks; _a < _b.length; _a++) {
@@ -52,11 +53,11 @@ var getSubProjResult = function (subProjs, postedChecks) {
     }
     ;
     if (result === "pending") {
-        return result;
+        finished = false;
     }
     if (hasFailure) {
-        return "has_failure";
+        return ["has_failure", finished];
     }
-    return result;
+    return [result, finished];
 };
 exports.getSubProjResult = getSubProjResult;

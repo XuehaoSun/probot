@@ -126,22 +126,22 @@ var CheckGroup = /** @class */ (function () {
     };
     CheckGroup.prototype.runCheck = function (subprojs, tries, interval) {
         return __awaiter(this, void 0, void 0, function () {
-            var postedChecks, result, error_1;
+            var postedChecks, _a, result, finished, error_1;
             var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
+            return __generator(this, function (_b) {
+                switch (_b.label) {
                     case 0:
-                        _a.trys.push([0, 2, , 3]);
+                        _b.trys.push([0, 2, , 3]);
                         // print in a group to reduce verbosity
                         core.startGroup("Check ".concat(tries));
                         return [4 /*yield*/, getPostedChecks(this.context, this.sha)];
                     case 1:
-                        postedChecks = _a.sent();
+                        postedChecks = _b.sent();
                         core.debug("postedChecks: ".concat(JSON.stringify(postedChecks)));
-                        result = (0, satisfy_expected_checks_1.getSubProjResult)(subprojs, postedChecks);
+                        _a = (0, satisfy_expected_checks_1.getSubProjResult)(subprojs, postedChecks), result = _a[0], finished = _a[1];
                         this.notifyProgress(subprojs, postedChecks, result);
                         core.endGroup();
-                        if (result !== "pending") {
+                        if (finished) {
                             core.info("All required checks were finished!");
                             clearTimeout(this.intervalTimer);
                             clearTimeout(this.timeoutTimer);
@@ -151,7 +151,7 @@ var CheckGroup = /** @class */ (function () {
                         }
                         return [3 /*break*/, 3];
                     case 2:
-                        error_1 = _a.sent();
+                        error_1 = _b.sent();
                         // bubble up the error to the job
                         core.setFailed(error_1);
                         clearTimeout(this.intervalTimer);

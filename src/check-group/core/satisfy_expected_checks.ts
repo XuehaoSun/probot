@@ -26,9 +26,10 @@ export const getChecksResult = (
 export const getSubProjResult = (
   subProjs: SubProjConfig[],
   postedChecks: Record<string, CheckRunData>,
-): CheckResult => {
+): [CheckResult, boolean] => {
   let result: CheckResult = "all_passing";
   let hasFailure: boolean = false;
+  let finished: boolean = true;
   for (const subProj of subProjs) {
     for (const check of subProj.checks) {
       if (check in postedChecks) {
@@ -47,10 +48,10 @@ export const getSubProjResult = (
     };
   };
   if (result === "pending") {
-    return result
+    finished = false
   }
   if (hasFailure) {
-    return "has_failure";
+    return ["has_failure", finished];
   }
-  return result;
+  return [result, finished];
 };

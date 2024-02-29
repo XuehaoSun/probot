@@ -87,11 +87,11 @@ export class CheckGroup {
       core.startGroup(`Check ${tries}`);
       const postedChecks = await getPostedChecks(this.context, this.sha);
       core.debug(`postedChecks: ${JSON.stringify(postedChecks)}`);
-      const result = getSubProjResult(subprojs, postedChecks);
+      const [result, finished] = getSubProjResult(subprojs, postedChecks);
       this.notifyProgress(subprojs, postedChecks, result)
       core.endGroup();
     
-      if (result !== "pending") {
+      if (finished) {
         core.info("All required checks were finished!")
         clearTimeout(this.intervalTimer)
         clearTimeout(this.timeoutTimer)
