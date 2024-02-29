@@ -51,6 +51,9 @@ var getSubProjResult = function (subProjs, postedChecks) {
         ;
     }
     ;
+    if (result === "pending") {
+        return result;
+    }
     if (hasFailure) {
         return "has_failure";
     }
