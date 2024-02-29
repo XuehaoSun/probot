@@ -46,27 +46,32 @@ async function checkURL(url: string): Promise<number> {
 
 export const getArtifactName = async (check: string, urlDict: { [name: string]: string }): Promise<string | undefined> => {
   if (artifactDict[`${check}`] !== undefined) {
-    let [id, name] = [artifactDict[`${check}`].id, artifactDict[`${check}`].name];
-    if (name != "zip") {
-      name = `file&subPath=%2F${name}`
+    let [id, fileName] = [artifactDict[`${check}`].id, artifactDict[`${check}`].name];
+    if (fileName != "zip") {
+      fileName = `file&subPath=%2F${fileName}`
     }
-    const link = `${urlDict[id]}${name}`;
-    let statusCode = await checkURL(link);
-    if (statusCode !== 200) {
-      return undefined;
-    } else {
-      return link
+
+    for (let i = 1; i < 50; i++) {
+      let checkID = `${i}_${id}`
+
+      if (i === 1 && !(checkID in urlDict)) {
+        return undefined
+      }
+
+      if (checkID in urlDict) {
+        continue;
+      } else {
+        checkID = `${i - 1}_${id}`
+        const link = `${urlDict[checkID]}${fileName}`;
+        const statusCode = await checkURL(link);
+        if (statusCode === 200) {
+          return link
+        }
+        break
+      }
     }
-    // for (let i = 1; i <= 10; i++) {
-    //   const link = `${urlDict[id]}${i}_${name}`;
-    //   let statusCode = await checkURL(link);
-    //   if (statusCode !== 200) {
-    //     return undefined;
-    //   } else {
-    //     return link
-    //   }
-    // }
-    // return undefined
+
+    return undefined
   } else {
     return undefined
   }

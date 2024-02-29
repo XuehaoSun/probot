@@ -178,7 +178,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 // generate the markdown table
                 progress += "<details>\n\n";
                 progress += "<summary><b>".concat(subprojectEmoji, " ").concat(subproject.id, "</b></summary>\n\n");
-                progress += "| Check ID | Status | link |     |\n";
+                progress += "| Check ID | Status | Error details |     |\n";
                 progress += "| -------- | ------ | ---- | --- |\n";
                 _a = 0, _b = subproject.checks;
                 _d.label = 2;
@@ -199,7 +199,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                     progress += "| ".concat(link, " | ").concat(status_2, " |  | ").concat(mark, " |\n");
                 }
                 else {
-                    progress += "| ".concat(link, " | ").concat(status_2, " | [artifact](").concat(artifactLink, ") | ").concat(mark, " |\n");
+                    progress += "| ".concat(link, " | ").concat(status_2, " | [download](").concat(artifactLink, ") | ").concat(mark, " |\n");
                 }
                 return [3 /*break*/, 6];
             case 5:
@@ -240,28 +240,6 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 console.error('Error:', error_2);
                 return [3 /*break*/, 13];
             case 13:
-                // if (subproject.id == "Model Tests workflow") {
-                //   const check = "Model-Test (Generate Report GenerateReport)"
-                //   const status = parseStatus(check, postedChecks)
-                //   if (status === "success" || status === "failure") {
-                //     const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
-                //     const artifactLink = getArtifactName(check, artifactLinkDict);
-                //     if (artifactLink !== undefined) {
-                //       try {
-                //         const fetchTableData = createFetcher('html');
-                //         const tableData = await fetchTableData.fetch(artifactLink);
-                //         progress += `\n\n<details>\n\n`
-                //         progress += `<summary><b>Model test report</b></summary>\n\n`;
-                //         for (const data of tableData) {
-                //           progress += `${data}`
-                //         }
-                //         progress += "\n\n</details>\n\n";
-                //       } catch (error) {
-                //         console.error('Error:', error);
-                //       }
-                //     }
-                //   }
-                // }
                 progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
                 progress += "\n</details>\n\n";
                 _d.label = 14;

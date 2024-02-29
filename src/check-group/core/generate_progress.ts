@@ -76,7 +76,7 @@ async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: st
     const artifactCount = azureArtifactsData.count;
     const artifactValue = azureArtifactsData.value;
 
-    if(artifactCount === 0) {
+    if (artifactCount === 0) {
       return {}
     }
 
@@ -145,7 +145,7 @@ export const generateProgressDetailsMarkdown = async (
     // generate the markdown table
     progress += "<details>\n\n"
     progress += `<summary><b>${subprojectEmoji} ${subproject.id}</b></summary>\n\n`;
-    progress += "| Check ID | Status | link |     |\n";
+    progress += "| Check ID | Status | Error details |     |\n";
     progress += "| -------- | ------ | ---- | --- |\n";
 
     for (const check of subproject.checks) {
@@ -158,7 +158,7 @@ export const generateProgressDetailsMarkdown = async (
         if (artifactLink === undefined) {
           progress += `| ${link} | ${status} |  | ${mark} |\n`;
         } else {
-          progress += `| ${link} | ${status} | [artifact](${artifactLink}) | ${mark} |\n`;
+          progress += `| ${link} | ${status} | [download](${artifactLink}) | ${mark} |\n`;
         }
       } else {
         progress += `| ${link} | ${status} |  | ${mark} |\n`;
@@ -173,8 +173,8 @@ export const generateProgressDetailsMarkdown = async (
         const artifactLink = await getArtifactName(check, artifactLinkDict);
         if (artifactLink !== undefined) {
           try {
-          const fetchTableData = createFetcher('html');
-          const tableData = await fetchTableData.fetch(artifactLink);
+            const fetchTableData = createFetcher('html');
+            const tableData = await fetchTableData.fetch(artifactLink);
             progress += `\n\n<details>\n\n`
             progress += `<summary><b>UT-Basic coverage report</b></summary>\n\n`;
             for (const data of tableData) {
@@ -188,28 +188,6 @@ export const generateProgressDetailsMarkdown = async (
       }
     }
 
-    // if (subproject.id == "Model Tests workflow") {
-    //   const check = "Model-Test (Generate Report GenerateReport)"
-    //   const status = parseStatus(check, postedChecks)
-    //   if (status === "success" || status === "failure") {
-    //     const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
-    //     const artifactLink = getArtifactName(check, artifactLinkDict);
-    //     if (artifactLink !== undefined) {
-    //       try {
-    //         const fetchTableData = createFetcher('html');
-    //         const tableData = await fetchTableData.fetch(artifactLink);
-    //         progress += `\n\n<details>\n\n`
-    //         progress += `<summary><b>Model test report</b></summary>\n\n`;
-    //         for (const data of tableData) {
-    //           progress += `${data}`
-    //         }
-    //         progress += "\n\n</details>\n\n";
-    //       } catch (error) {
-    //         console.error('Error:', error);
-    //       }
-    //     }
-    //   }
-    // }
     progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
     progress += "\n</details>\n\n";
   };
