@@ -9,7 +9,7 @@ export const artifactDict: { [key: string]: { id: string, name: string } } = {
   "Code-Scan-Neural-Solution (DocStyle Code Scan DocStyle)": { id: "pydocstyle", name: "pydocstyle.log" },
   "Code-Scan-Neural-Solution (Pylint Code Scan Pylint)": { id: "bandit", name: "bandit.log" },
   "Model-Test (Generate Report GenerateReport)": { id: "FinalReport", name: "report.html" },
-  "UT-Basic (Coverage Combine CollectDatafiles)": { id: "UT_coverage_report", name: "coverage_compare.html" },
+  "UT-Basic (Coverage Compare CollectDatafiles)": { id: "UT_coverage_report", name: "zip" },
   "UT-Basic (Unit Test FWKs adaptor Test FWKs adaptor)": { id: "ut_adaptor_report", name: "ut_tf_2.14.0_pt_2.1.0+cpu.log" },
   "UT-Basic (Unit Test FWKs adaptor baseline Test FWKs adaptor baseline)": { id: "ut-base_adaptor_report", name: "ut_tf_2.14.0_pt_2.1.0+cpu.log" },
   "UT-Basic (Unit Test ITEX Test ITEX)": { id: "ut_itex_report", name: "ut_itex.log" },
