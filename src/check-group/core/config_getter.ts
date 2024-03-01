@@ -51,27 +51,26 @@ export const getArtifactName = async (check: string, urlDict: { [name: string]: 
       fileName = `file&subPath=%2F${fileName}`
     }
 
-    for (let i = 1; i < 50; i++) {
-      let checkID = `${i}_${id}`
+    const getCheckID = (num: number): string => {
+      return (num === 0) ? id : `${num}_${id}`
+    }
 
-      if (i === 1 && !(checkID in urlDict)) {
-        return undefined
-      }
+    let link: string | undefined = undefined
 
-      if (checkID in urlDict) {
-        continue;
-      } else {
-        checkID = `${i - 1}_${id}`
-        const link = `${urlDict[checkID]}${fileName}`;
-        const statusCode = await checkURL(link);
-        if (statusCode === 200) {
-          return link
-        }
+    for (let iter = 0; iter < 40; iter++) {
+      let checkID = getCheckID(iter)
+      if (!(checkID in urlDict) && iter >= 2) {
         break
+      } else {
+        const checkLink = `${urlDict[checkID]}${fileName}`;
+        const statusCode = await checkURL(checkLink);
+        if (statusCode === 200) {
+          link = checkLink
+        }
       }
     }
 
-    return undefined
+    return link
   } else {
     return undefined
   }
