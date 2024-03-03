@@ -210,13 +210,13 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 return [3 /*break*/, 2];
             case 7:
                 if (!(subproject.id == "Unit Tests basic workflow")) return [3 /*break*/, 13];
-                check = "UT-Basic (Coverage Combine CollectDatafiles)";
+                check = "UT-Basic (Coverage Compare CollectDatafiles)";
                 status_3 = parseStatus(check, postedChecks);
                 if (!(status_3 === "success" || status_3 === "failure")) return [3 /*break*/, 13];
                 return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
             case 8:
                 artifactLinkDict = _d.sent();
-                return [4 /*yield*/, (0, config_getter_1.getArtifactName)(check, artifactLinkDict)];
+                return [4 /*yield*/, (0, config_getter_1.getArtifactName)("UT-Basic-coverage", artifactLinkDict)];
             case 9:
                 artifactLink = _d.sent();
                 if (!(artifactLink !== undefined)) return [3 /*break*/, 13];

@@ -166,11 +166,11 @@ export const generateProgressDetailsMarkdown = async (
     }
 
     if (subproject.id == "Unit Tests basic workflow") {
-      const check = "UT-Basic (Coverage Combine CollectDatafiles)"
+      const check = "UT-Basic (Coverage Compare CollectDatafiles)"
       const status = parseStatus(check, postedChecks)
       if (status === "success" || status === "failure") {
         const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
-        const artifactLink = await getArtifactName(check, artifactLinkDict);
+        const artifactLink = await getArtifactName("UT-Basic-coverage", artifactLinkDict);
         if (artifactLink !== undefined) {
           try {
             const fetchTableData = createFetcher('html');
