@@ -60,7 +60,7 @@ var HTMLTableFetcher = /** @class */ (function () {
                         $_1 = cheerio_1.default.load(html);
                         tables_1 = [];
                         $_1('table').each(function (index, element) {
-                            tables_1.push("<table>".concat($_1(element).html(), "</table>") || '');
+                            tables_1.push("<table>".concat($_1(element).html().replace(/^\s*\n/gm, ""), "</table>") || '');
                         });
                         return [2 /*return*/, tables_1];
                     case 2:

@@ -17,7 +17,7 @@ class HTMLTableFetcher implements TableFetcher {
 
       const tables: string[] = [];
       $('table').each((index, element) => {
-          tables.push(`<table>${$(element).html()}</table>` || '');
+          tables.push(`<table>${$(element).html().replace(/^\s*\n/gm, "")}</table>` || '');
       });
 
       return tables;
