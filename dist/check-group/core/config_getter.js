@@ -136,40 +136,22 @@ function checkURL(url) {
     });
 }
 var getArtifactName = function (check, urlDict) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, id_1, fileName, getCheckID, link, iter, checkID, checkLink, statusCode;
+    var _a, id, _, link, checkLink, statusCode;
     return __generator(this, function (_b) {
         switch (_b.label) {
             case 0:
-                if (!(constant_1.artifactDict["".concat(check)] !== undefined)) return [3 /*break*/, 6];
-                _a = [constant_1.artifactDict["".concat(check)].id, constant_1.artifactDict["".concat(check)].name], id_1 = _a[0], fileName = _a[1];
-                if (fileName != "zip") {
-                    fileName = "file&subPath=%2F".concat(fileName);
-                }
-                getCheckID = function (num) {
-                    return (num === 0) ? id_1 : "".concat(num, "_").concat(id_1);
-                };
+                if (!(constant_1.artifactDict["".concat(check)] !== undefined)) return [3 /*break*/, 2];
+                _a = [constant_1.artifactDict["".concat(check)].id, constant_1.artifactDict["".concat(check)].name], id = _a[0], _ = _a[1];
                 link = undefined;
-                iter = 0;
-                _b.label = 1;
-            case 1:
-                if (!(iter < 40)) return [3 /*break*/, 5];
-                checkID = getCheckID(iter);
-                if (!(!(checkID in urlDict) && iter >= 2)) return [3 /*break*/, 2];
-                return [3 /*break*/, 5];
-            case 2:
-                checkLink = "".concat(urlDict[checkID]).concat(fileName);
+                checkLink = urlDict[id];
                 return [4 /*yield*/, checkURL(checkLink)];
-            case 3:
+            case 1:
                 statusCode = _b.sent();
                 if (statusCode === 200) {
                     link = checkLink;
                 }
-                _b.label = 4;
-            case 4:
-                iter++;
-                return [3 /*break*/, 1];
-            case 5: return [2 /*return*/, link];
-            case 6: return [2 /*return*/, undefined];
+                return [2 /*return*/, link];
+            case 2: return [2 /*return*/, undefined];
         }
     });
 }); };
