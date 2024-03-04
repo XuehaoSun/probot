@@ -46,30 +46,13 @@ async function checkURL(url: string): Promise<number> {
 
 export const getArtifactName = async (check: string, urlDict: { [name: string]: string }): Promise<string | undefined> => {
   if (artifactDict[`${check}`] !== undefined) {
-    let [id, fileName] = [artifactDict[`${check}`].id, artifactDict[`${check}`].name];
-    if (fileName != "zip") {
-      fileName = `file&subPath=%2F${fileName}`
-    }
-
-    const getCheckID = (num: number): string => {
-      return (num === 0) ? id : `${num}_${id}`
-    }
-
+    const [id, _] = [artifactDict[`${check}`].id, artifactDict[`${check}`].name];
     let link: string | undefined = undefined
-
-    for (let iter = 0; iter < 40; iter++) {
-      let checkID = getCheckID(iter)
-      if (!(checkID in urlDict) && iter >= 2) {
-        break
-      } else {
-        const checkLink = `${urlDict[checkID]}${fileName}`;
-        const statusCode = await checkURL(checkLink);
-        if (statusCode === 200) {
-          link = checkLink
-        }
-      }
+    const checkLink = urlDict[id];
+    const statusCode = await checkURL(checkLink);
+    if (statusCode === 200) {
+      link = checkLink
     }
-
     return link
   } else {
     return undefined

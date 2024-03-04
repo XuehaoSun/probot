@@ -57,39 +57,43 @@ const parseStatus = (
   return "no_status"
 }
 
-async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: string }> {
-  const regex = /buildId=(\d+)/;
-  const match = detailURL.match(regex);
-  let buildId: string = ""
+const getRunID = (url: string): number => {
+  const regex = /runs\/(\d+)\/job/;
+  const match = url.match(regex);
 
-  if (match && match.length > 1) {
-    buildId = match[1];
+  if (match) {
+    const runsNumber = match[1];
+    return parseInt(runsNumber, 10)
   } else {
-    return {};
+    return NaN
   }
+}
 
-  const azureArtifactApiUrl = `https://dev.azure.com/lpot-inc/neural-compressor/_apis/build/builds/${buildId}/artifacts?api-version=5.1`;
+async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: string }> {
+  let runID = getRunID(detailURL)
+
+  // https://docs.github.com/zh/rest/actions/artifacts?apiVersion=2022-11-28#list-workflow-run-artifacts
+  const githubRestArtifactApiUrl = `https://api.github.com/repos/intel/intel-extension-for-transformers/actions/runs/${runID}/artifacts`;
 
   try {
-    const response = await axios.get(azureArtifactApiUrl);
-    const azureArtifactsData = response.data;
-    const artifactCount = azureArtifactsData.count;
-    const artifactValue = azureArtifactsData.value;
+    const response = await axios.get(githubRestArtifactApiUrl);
+    const githubActionsArtifactsData = response.data;
+    const artifactCount = githubActionsArtifactsData.total_count;
+    const artifactValue = githubActionsArtifactsData.artifacts;
 
     if (artifactCount === 0) {
       return {}
     }
 
     const urlDict: { [name: string]: string } = {};
-
     for (const item of artifactValue) {
-      const artifactDownloadUrl = `${item.resource.downloadUrl.slice(0, -3)}`;
+      const artifactDownloadUrl = `https://github.com/intel/intel-extension-for-transformers/actions/runs/${runID}/artifacts/${item.id}`;
       urlDict[item.name] = artifactDownloadUrl;
     }
 
     return urlDict;
   } catch (error) {
-    console.error('Error fetching Azure artifact information:', error);
+    console.error('Error fetching artifact information:', error);
     return {};
   }
 }
@@ -165,29 +169,6 @@ export const generateProgressDetailsMarkdown = async (
       }
     }
 
-    if (subproject.id == "Unit Tests basic workflow") {
-      const check = "UT-Basic (Coverage Compare CollectDatafiles)"
-      const status = parseStatus(check, postedChecks)
-      if (status === "success" || status === "failure") {
-        const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
-        const artifactLink = await getArtifactName("UT-Basic-coverage", artifactLinkDict);
-        if (artifactLink !== undefined) {
-          try {
-            const fetchTableData = createFetcher('html');
-            const tableData = await fetchTableData.fetch(artifactLink);
-            progress += `\n\n<details>\n\n`
-            progress += `<summary><b>UT-Basic coverage report</b></summary>\n\n`;
-            for (const data of tableData) {
-              progress += `${data}`
-            }
-            progress += "\n\n</details>\n\n";
-          } catch (error) {
-            console.error('Error:', error);
-          }
-        }
-      }
-    }
-
     progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
     progress += "\n</details>\n\n";
   };
@@ -210,7 +191,7 @@ async function formPrComment(
   const lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️"
   const failedMesage = (
     `> **Warning**\n> This job will need to be re-run to merge your PR.`
-    + ` If you do not have write access to the repository, you can ask \`${inputs.maintainers}\` to re-run it.`
+    + ` If you do not have write access to the repository, you can ask ${inputs.maintainers} to re-run it.`
     + " If you push a new commit, all of CI will re-trigger.\n\n"
   )
 
@@ -223,7 +204,7 @@ async function formPrComment(
     + "---\n\n"
     + "Thank you for your contribution! 💜\n\n"
     + `> **Note**\n> This comment is automatically generated and updates for ${inputs.timeout} minutes every ${inputs.interval} seconds.`
-    + ` If you have any other questions, contact \`${inputs.owner}\` for help.`
+    + ` If you have any other questions, contact ${inputs.owner} for help.`
   )
 }
 
