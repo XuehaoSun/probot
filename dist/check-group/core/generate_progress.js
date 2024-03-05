@@ -289,6 +289,7 @@ function commentOnPr(context, result, inputs, subprojects, postedChecks) {
                 case 2:
                     newComment = _a.sent();
                     if (existingData.body === newComment) {
+                        console.log("Comments are the same as before, skip😊");
                         return [2 /*return*/];
                     }
                     if (!(existingData.id === 0)) return [3 /*break*/, 4];
