@@ -190,7 +190,7 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 link = statusToLink(check, postedChecks);
                 status_2 = parseStatus(check, postedChecks);
                 mark = statusToMark(check, postedChecks);
-                if (!(status_2 === "failure")) return [3 /*break*/, 5];
+                if (!(status_2 === "success" || status_2 === "failure")) return [3 /*break*/, 5];
                 return [4 /*yield*/, parseDownloadUrl(postedChecks[check].details_url)];
             case 3:
                 artifactLinkDict = _c.sent();
