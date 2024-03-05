@@ -95,7 +95,7 @@ var getRunID = function (url) {
 };
 function parseDownloadUrl(detailURL) {
     return __awaiter(this, void 0, void 0, function () {
-        var runID, githubRestArtifactApiUrl, response, githubActionsArtifactsData, artifactCount, artifactValue, urlDict, _i, artifactValue_1, item, artifactDownloadUrl, error_1;
+        var runID, githubRestArtifactApiUrl, response, githubActionsArtifactsData, artifactCount, artifactValue, urlDict, _i, artifactValue_1, item, artifactDownloadUrl, statusCode, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -103,7 +103,7 @@ function parseDownloadUrl(detailURL) {
                     githubRestArtifactApiUrl = "https://api.github.com/repos/intel/intel-extension-for-transformers/actions/runs/".concat(runID, "/artifacts");
                     _a.label = 1;
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
+                    _a.trys.push([1, 7, , 8]);
                     return [4 /*yield*/, axios_1.default.get(githubRestArtifactApiUrl)];
                 case 2:
                     response = _a.sent();
@@ -114,17 +114,32 @@ function parseDownloadUrl(detailURL) {
                         return [2 /*return*/, {}];
                     }
                     urlDict = {};
-                    for (_i = 0, artifactValue_1 = artifactValue; _i < artifactValue_1.length; _i++) {
-                        item = artifactValue_1[_i];
-                        artifactDownloadUrl = "https://github.com/intel/intel-extension-for-transformers/actions/runs/".concat(runID, "/artifacts/").concat(item.id);
+                    _i = 0, artifactValue_1 = artifactValue;
+                    _a.label = 3;
+                case 3:
+                    if (!(_i < artifactValue_1.length)) return [3 /*break*/, 6];
+                    item = artifactValue_1[_i];
+                    artifactDownloadUrl = "https://github.com/intel/intel-extension-for-transformers/actions/runs/".concat(runID, "/artifacts/").concat(item.id);
+                    return [4 /*yield*/, (0, config_getter_1.checkURL)("https://api.github.com/repos/intel/intel-extension-for-transformers/actions/artifacts/".concat(item.id))];
+                case 4:
+                    statusCode = _a.sent();
+                    urlDict[item.name] = undefined;
+                    if (statusCode === 200) {
                         urlDict[item.name] = artifactDownloadUrl;
                     }
-                    return [2 /*return*/, urlDict];
-                case 3:
+                    else {
+                        console.log("".concat(artifactDownloadUrl, " invalid"));
+                    }
+                    _a.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 6: return [2 /*return*/, urlDict];
+                case 7:
                     error_1 = _a.sent();
                     console.error('Error fetching artifact information:', error_1);
                     return [2 /*return*/, {}];
-                case 4: return [2 /*return*/];
+                case 8: return [2 /*return*/];
             }
         });
     });

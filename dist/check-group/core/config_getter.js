@@ -73,7 +73,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getArtifactName = exports.fetchConfig = void 0;
+exports.getArtifactName = exports.checkURL = exports.fetchConfig = void 0;
 var user_config_parser_1 = require("./user_config_parser");
 var constant_1 = require("./constant");
 var core = __importStar(require("@actions/core"));
@@ -135,27 +135,19 @@ function checkURL(url) {
         });
     });
 }
+exports.checkURL = checkURL;
 var getArtifactName = function (check, urlDict) { return __awaiter(void 0, void 0, void 0, function () {
-    var _a, id, _, link, checkLink, statusCode;
+    var _a, id, _, checkLink;
     return __generator(this, function (_b) {
-        switch (_b.label) {
-            case 0:
-                if (!(constant_1.artifactDict["".concat(check)] !== undefined)) return [3 /*break*/, 2];
-                _a = [constant_1.artifactDict["".concat(check)].id, constant_1.artifactDict["".concat(check)].name], id = _a[0], _ = _a[1];
-                link = undefined;
-                checkLink = urlDict[id];
-                return [4 /*yield*/, checkURL(checkLink)];
-            case 1:
-                statusCode = _b.sent();
-                if (statusCode === 200) {
-                    link = checkLink;
-                }
-                else {
-                    console.log("".concat(checkLink, " invalid"));
-                }
-                return [2 /*return*/, link];
-            case 2: return [2 /*return*/, undefined];
+        if (constant_1.artifactDict["".concat(check)] !== undefined) {
+            _a = [constant_1.artifactDict["".concat(check)].id, constant_1.artifactDict["".concat(check)].name], id = _a[0], _ = _a[1];
+            checkLink = urlDict[id];
+            return [2 /*return*/, checkLink];
         }
+        else {
+            return [2 /*return*/, undefined];
+        }
+        return [2 /*return*/];
     });
 }); };
 exports.getArtifactName = getArtifactName;

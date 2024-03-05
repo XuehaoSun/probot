@@ -32,7 +32,7 @@ export const fetchConfig = async (context: Context): Promise<CheckGroupConfig> =
   return parseUserConfig(configData);
 };
 
-async function checkURL(url: string): Promise<number> {
+export async function checkURL(url: string): Promise<number> {
   const statusCode: number =
     await axios.get(url)
       .then((response: AxiosResponse<{ user: { name: string } }>) => {
@@ -47,15 +47,8 @@ async function checkURL(url: string): Promise<number> {
 export const getArtifactName = async (check: string, urlDict: { [name: string]: string }): Promise<string | undefined> => {
   if (artifactDict[`${check}`] !== undefined) {
     const [id, _] = [artifactDict[`${check}`].id, artifactDict[`${check}`].name];
-    let link: string | undefined = undefined
     const checkLink = urlDict[id];
-    const statusCode = await checkURL(checkLink);
-    if (statusCode === 200) {
-      link = checkLink
-    } else {
-      console.log(`${checkLink} invalid`);
-    }
-    return link
+    return checkLink
   } else {
     return undefined
   }

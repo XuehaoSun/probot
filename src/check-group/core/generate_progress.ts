@@ -3,7 +3,7 @@ import { Context } from "probot";
 import { getChecksResult } from "./satisfy_expected_checks";
 
 import axios from 'axios';
-import { getArtifactName } from "./config_getter";
+import { checkURL, getArtifactName } from "./config_getter";
 import { createFetcher } from "./parse_artifact";
 
 
@@ -85,10 +85,16 @@ async function parseDownloadUrl(detailURL: string): Promise<{ [name: string]: st
       return {}
     }
 
-    const urlDict: { [name: string]: string } = {};
+    const urlDict: { [name: string]: string | undefined } = {};
     for (const item of artifactValue) {
       const artifactDownloadUrl = `https://github.com/intel/intel-extension-for-transformers/actions/runs/${runID}/artifacts/${item.id}`;
-      urlDict[item.name] = artifactDownloadUrl;
+      const statusCode = await checkURL(`https://api.github.com/repos/intel/intel-extension-for-transformers/actions/artifacts/${item.id}`);
+      urlDict[item.name] = undefined
+      if (statusCode === 200) {
+        urlDict[item.name] = artifactDownloadUrl
+      } else {
+        console.log(`${artifactDownloadUrl} invalid`);
+      }
     }
 
     return urlDict;
