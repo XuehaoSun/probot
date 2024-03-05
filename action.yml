@@ -8,6 +8,8 @@ inputs:
     required: true
   owner:
     required: true
+  token:
+    required: true
   timeout:
     required: false
     default: 60  # minutes
