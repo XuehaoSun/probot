@@ -53,7 +53,7 @@ export const getArtifactName = async (check: string, urlDict: { [name: string]: 
     if (statusCode === 200) {
       link = checkLink
     } else {
-      console.log(`${link} invalid`);
+      console.log(`${checkLink} invalid`);
     }
     return link
   } else {

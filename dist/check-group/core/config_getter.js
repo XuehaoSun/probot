@@ -151,7 +151,7 @@ var getArtifactName = function (check, urlDict) { return __awaiter(void 0, void 
                     link = checkLink;
                 }
                 else {
-                    console.log("".concat(link, " invalid"));
+                    console.log("".concat(checkLink, " invalid"));
                 }
                 return [2 /*return*/, link];
             case 2: return [2 /*return*/, undefined];
