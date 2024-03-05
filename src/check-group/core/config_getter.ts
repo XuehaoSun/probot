@@ -33,8 +33,13 @@ export const fetchConfig = async (context: Context): Promise<CheckGroupConfig> =
 };
 
 export async function checkURL(url: string): Promise<number> {
+  const token = core.getInput('token');
+  const config = {
+    headers: { Authorization: `Bearer ${token}` }
+  }
+
   const statusCode: number =
-    await axios.get(url)
+    await axios.get(url, config)
       .then((response: AxiosResponse<{ user: { name: string } }>) => {
         return response.status;
       })

@@ -117,17 +117,22 @@ var fetchConfig = function (context) { return __awaiter(void 0, void 0, void 0, 
 exports.fetchConfig = fetchConfig;
 function checkURL(url) {
     return __awaiter(this, void 0, void 0, function () {
-        var statusCode;
+        var token, config, statusCode;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, axios_1.default.get(url)
-                        .then(function (response) {
-                        return response.status;
-                    })
-                        .catch(function (reason) {
-                        var _a;
-                        return (_a = reason.response) === null || _a === void 0 ? void 0 : _a.status;
-                    })];
+                case 0:
+                    token = core.getInput('token');
+                    config = {
+                        headers: { Authorization: "Bearer ".concat(token) }
+                    };
+                    return [4 /*yield*/, axios_1.default.get(url, config)
+                            .then(function (response) {
+                            return response.status;
+                        })
+                            .catch(function (reason) {
+                            var _a;
+                            return (_a = reason.response) === null || _a === void 0 ? void 0 : _a.status;
+                        })];
                 case 1:
                     statusCode = _a.sent();
                     return [2 /*return*/, statusCode];
