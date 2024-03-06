@@ -162,7 +162,7 @@ export const generateProgressDetailsMarkdown = async (
       const link = statusToLink(check, postedChecks);
       const status = parseStatus(check, postedChecks);
       const mark = statusToMark(check, postedChecks);
-      if (status === "success" || status === "failure") {
+      if (status === "failure") {
         const artifactLinkDict = await parseDownloadUrl(postedChecks[check].details_url);
         const artifactLink = await getArtifactName(check, artifactLinkDict);
         if (artifactLink === undefined) {
