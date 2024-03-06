@@ -209,9 +209,9 @@ async function formPrComment(
   const conclusionEmoji = (result === "all_passing") ? "🟢" : (hasFailed) ? "🔴" : "🟡"
   const lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️"
   const failedMesage = (
-    `> **Warning**\n> This job will need to be re-run to merge your PR.`
-    + ` If you do not have write access to the repository, you can ask ${inputs.maintainers} to re-run it.`
-    + " If you push a new commit, all of CI will re-trigger.\n\n"
+    `> **Warning**\n> `
+    + ` If you do not have the access to re-run the Probot, please contact ${inputs.maintainers} for help.`
+    + " If you push a new commit, all of the workflow will be re-triggered.\n\n"
   )
 
   const progressDetails = await generateProgressDetailsMarkdown(subprojects, postedChecks)

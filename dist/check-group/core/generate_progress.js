@@ -266,9 +266,9 @@ function formPrComment(result, inputs, subprojects, postedChecks) {
                     hasFailed = result === "has_failure";
                     conclusionEmoji = (result === "all_passing") ? "🟢" : (hasFailed) ? "🔴" : "🟡";
                     lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️";
-                    failedMesage = ("> **Warning**\n> This job will need to be re-run to merge your PR."
-                        + " If you do not have write access to the repository, you can ask ".concat(inputs.maintainers, " to re-run it.")
-                        + " If you push a new commit, all of CI will re-trigger.\n\n");
+                    failedMesage = ("> **Warning**\n> "
+                        + " If you do not have the access to re-run the Probot, please contact ".concat(inputs.maintainers, " for help.")
+                        + " If you push a new commit, all of the workflow will be re-triggered.\n\n");
                     return [4 /*yield*/, (0, exports.generateProgressDetailsMarkdown)(subprojects, postedChecks)];
                 case 1:
                     progressDetails = _a.sent();
