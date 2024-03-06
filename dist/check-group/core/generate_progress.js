@@ -267,7 +267,7 @@ function formPrComment(result, inputs, subprojects, postedChecks) {
                     conclusionEmoji = (result === "all_passing") ? "🟢" : (hasFailed) ? "🔴" : "🟡";
                     lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️";
                     failedMesage = ("> **Warning**\n> This job will need to be re-run to merge your PR."
-                        + " If you do not have write access to the repository, you can ask `".concat(inputs.maintainers, "` to re-run it.")
+                        + " If you do not have write access to the repository, you can ask ".concat(inputs.maintainers, " to re-run it.")
                         + " If you push a new commit, all of CI will re-trigger.\n\n");
                     return [4 /*yield*/, (0, exports.generateProgressDetailsMarkdown)(subprojects, postedChecks)];
                 case 1:
@@ -279,7 +279,7 @@ function formPrComment(result, inputs, subprojects, postedChecks) {
                             + "---\n\n"
                             + "Thank you for your contribution! 💜\n\n"
                             + "> **Note**\n> This comment is automatically generated and updates for ".concat(inputs.timeout, " minutes every ").concat(inputs.interval, " seconds.")
-                            + " If you have any other questions, contact `".concat(inputs.owner, "` for help."))];
+                            + " If you have any other questions, contact ".concat(inputs.owner, " for help."))];
             }
         });
     });

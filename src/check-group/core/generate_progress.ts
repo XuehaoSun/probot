@@ -210,7 +210,7 @@ async function formPrComment(
   const lightning = (result === "all_passing") ? "⚡" : (hasFailed) ? "⛈️" : "🌩️"
   const failedMesage = (
     `> **Warning**\n> This job will need to be re-run to merge your PR.`
-    + ` If you do not have write access to the repository, you can ask \`${inputs.maintainers}\` to re-run it.`
+    + ` If you do not have write access to the repository, you can ask ${inputs.maintainers} to re-run it.`
     + " If you push a new commit, all of CI will re-trigger.\n\n"
   )
 
@@ -223,7 +223,7 @@ async function formPrComment(
     + "---\n\n"
     + "Thank you for your contribution! 💜\n\n"
     + `> **Note**\n> This comment is automatically generated and updates for ${inputs.timeout} minutes every ${inputs.interval} seconds.`
-    + ` If you have any other questions, contact \`${inputs.owner}\` for help.`
+    + ` If you have any other questions, contact ${inputs.owner} for help.`
   )
 }
 
