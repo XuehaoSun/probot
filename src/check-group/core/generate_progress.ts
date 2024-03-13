@@ -249,6 +249,7 @@ export async function commentOnPr(
   context.log.debug(`existingData: ${JSON.stringify(existingData)}`)
   const newComment = await formPrComment(result, inputs, subprojects, postedChecks);
   if (existingData.body === newComment) {
+    console.log("Comments are the same as before, skip😊");
     return;
   }
   if (existingData.id === 0) {
