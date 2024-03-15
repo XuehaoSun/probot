@@ -43,4 +43,8 @@ export const artifactDict: { [key: string]: { id: string, name: string } } = {
   "UT-3x-ONNXRT (Coverage Compare CollectDatafiles)": { id: "UT_coverage_report_3x_ort", name: "zip" },
   "UT-3x-ONNXRT (Unit Test 3x ONNXRT Unit Test 3x ONNXRT)": { id: "ut_3x_report", name: "report.html" },
   "UT-3x-ONNXRT (Unit Test 3x ONNXRT baseline Unit Test 3x ONNXRT baseline)": { id: "ut_3x_baseline_report", name: "report.html" },
+  "Model-Test-3x (Generate Report GenerateReport)": { id: "FinalReport", name: "report.html" },
+  "Model-Test-3x (Run PyTorch Model opt_125m_woq_gptq_int4)": { id: "pytorch_opt_125m_woq_gptq_int4", name: "pytorch_opt_125m_woq_gptq_int4-tune.log" },
+  "Model-Test-3x (Run PyTorch Model opt_125m_woq_gptq_int4_dq_bnb)": { id: "pytorch_opt_125m_woq_gptq_int4_dq_bnb", name: "pytorch_opt_125m_woq_gptq_int4_dq_bnb.log" },
+  "Model-Test-3x (Run PyTorch Model opt_125m_woq_gptq_int4_dq_ggml)": { id: "pytorch_opt_125m_woq_gptq_int4_dq_ggml", name: "pytorch_opt_125m_woq_gptq_int4_dq_ggml.log" },
 }
