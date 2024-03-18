@@ -174,7 +174,7 @@ var generateProgressDetailsCLI = function (subprojects, postedChecks) {
 };
 exports.generateProgressDetailsCLI = generateProgressDetailsCLI;
 var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { return __awaiter(void 0, void 0, void 0, function () {
-    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink;
+    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink, truncatedPaths, remainingPathsCount;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
@@ -226,7 +226,14 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 _a++;
                 return [3 /*break*/, 2];
             case 7:
-                progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
+                if (subproject.paths.length > 20) {
+                    truncatedPaths = subproject.paths.slice(0, 20).join("`, `");
+                    remainingPathsCount = subproject.paths.length - 20;
+                    progress += "\nThese checks are required after the changes to `".concat(truncatedPaths, "` and ").concat(remainingPathsCount, " more file").concat(remainingPathsCount > 1 ? 's' : '', "...");
+                }
+                else {
+                    progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.");
+                }
                 progress += "\n</details>\n\n";
                 _c.label = 8;
             case 8:
