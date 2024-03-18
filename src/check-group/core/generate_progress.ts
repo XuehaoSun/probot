@@ -188,7 +188,13 @@ export const generateProgressDetailsMarkdown = async (
       }
     }
 
-    progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.\n`
+    if (subproject.paths.length > 20) {
+      const truncatedPaths = subproject.paths.slice(0, 20).join("`, `");
+      const remainingPathsCount = subproject.paths.length - 20;
+      progress += `\nThese checks are required after the changes to \`${truncatedPaths}\` and ${remainingPathsCount} more file${remainingPathsCount > 1 ? 's' : ''}...`;
+    } else {
+      progress += `\nThese checks are required after the changes to \`${subproject.paths.join("`, `")}\`.`;
+    }
     progress += "\n</details>\n\n";
   };
   return progress;

@@ -157,7 +157,7 @@ var generateProgressDetailsCLI = function (subprojects, postedChecks) {
 };
 exports.generateProgressDetailsCLI = generateProgressDetailsCLI;
 var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { return __awaiter(void 0, void 0, void 0, function () {
-    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink, check, status_3, artifactLinkDict, artifactLink, fetchTableData, tableData, _c, tableData_1, data, error_2;
+    var progress, _i, subprojects_1, subproject, checkResult, subprojectEmoji, _a, _b, check, link, status_2, mark, artifactLinkDict, artifactLink, check, status_3, artifactLinkDict, artifactLink, fetchTableData, tableData, _c, tableData_1, data, error_2, truncatedPaths, remainingPathsCount;
     return __generator(this, function (_d) {
         switch (_d.label) {
             case 0:
@@ -240,7 +240,14 @@ var generateProgressDetailsMarkdown = function (subprojects, postedChecks) { ret
                 console.error('Error:', error_2);
                 return [3 /*break*/, 13];
             case 13:
-                progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.\n");
+                if (subproject.paths.length > 20) {
+                    truncatedPaths = subproject.paths.slice(0, 20).join("`, `");
+                    remainingPathsCount = subproject.paths.length - 20;
+                    progress += "\nThese checks are required after the changes to `".concat(truncatedPaths, "` and ").concat(remainingPathsCount, " more file").concat(remainingPathsCount > 1 ? 's' : '', "...");
+                }
+                else {
+                    progress += "\nThese checks are required after the changes to `".concat(subproject.paths.join("`, `"), "`.");
+                }
                 progress += "\n</details>\n\n";
                 _d.label = 14;
             case 14:
