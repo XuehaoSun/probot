@@ -263,7 +263,7 @@ exports.generateProgressDetailsMarkdown = generateProgressDetailsMarkdown;
 var PR_COMMENT_START = "<!-- checkgroup-comment-start -->";
 function formPrComment(result, inputs, subprojects, postedChecks) {
     return __awaiter(this, void 0, void 0, function () {
-        var parsedConclusion, hasFailed, conclusionEmoji, lightning, failedMesage, progressDetails;
+        var parsedConclusion, hasFailed, conclusionEmoji, lightning, failedMesage, timeoutHours, progressDetails;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -276,6 +276,7 @@ function formPrComment(result, inputs, subprojects, postedChecks) {
                     failedMesage = ("> **Warning**\n> "
                         + " If you do not have the access to re-run the Probot, please contact ".concat(inputs.maintainers, " for help.")
                         + " If you push a new commit, all of the workflow will be re-triggered.\n\n");
+                    timeoutHours = inputs.timeout / 60;
                     return [4 /*yield*/, (0, exports.generateProgressDetailsMarkdown)(subprojects, postedChecks)];
                 case 1:
                     progressDetails = _a.sent();
@@ -285,7 +286,7 @@ function formPrComment(result, inputs, subprojects, postedChecks) {
                             + ((subprojects.length) ? progressDetails : "No groups match the files changed in this PR.\n\n")
                             + "---\n\n"
                             + "Thank you for your contribution! 💜\n\n"
-                            + "> **Note**\n> This comment is automatically generated and updates for ".concat(inputs.timeout, " minutes every ").concat(inputs.interval, " seconds.")
+                            + "> **Note**\n> This comment is automatically generated and will be updates every ".concat(inputs.interval, " seconds within the next ").concat(timeoutHours, " hours.")
                             + " If you have any other questions, contact ".concat(inputs.owner, " for help."))];
             }
         });

@@ -219,6 +219,7 @@ async function formPrComment(
     + ` If you do not have the access to re-run the Probot, please contact ${inputs.maintainers} for help.`
     + " If you push a new commit, all of the workflow will be re-triggered.\n\n"
   )
+  const timeoutHours = inputs.timeout / 60
 
   const progressDetails = await generateProgressDetailsMarkdown(subprojects, postedChecks)
   return (
@@ -228,7 +229,7 @@ async function formPrComment(
     + ((subprojects.length) ? progressDetails : "No groups match the files changed in this PR.\n\n")
     + "---\n\n"
     + "Thank you for your contribution! 💜\n\n"
-    + `> **Note**\n> This comment is automatically generated and updates for ${inputs.timeout} minutes every ${inputs.interval} seconds.`
+    + `> **Note**\n> This comment is automatically generated and will be updates every ${inputs.interval} seconds within the next ${timeoutHours} hours.`
     + ` If you have any other questions, contact ${inputs.owner} for help.`
   )
 }
