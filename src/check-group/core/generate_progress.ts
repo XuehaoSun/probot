@@ -220,6 +220,7 @@ async function formPrComment(
     + `> **Note**\n> This comment is automatically generated and will be updates every ${inputs.interval} seconds within the next ${timeoutHours} hours.`
     + ` If you have any other questions, contact ${inputs.owner} for help.`
   )
+}
 
 async function getPrComment(context: Context): Promise<{ id: number; body: string }> {
   const params = context.issue()
